@@ -24,10 +24,13 @@
     <ProjectReference Include="..\Shared\ConstructionExchangeQuotes.Shared.csproj" />
   </ItemGroup>
 
+<<<<<<< Updated upstream
   <ItemGroup>
     <Folder Include="Controllers\" />
     <Folder Include="Repositories\" />
   </ItemGroup>
 
+=======
+>>>>>>> Stashed changes
 
 </Project>

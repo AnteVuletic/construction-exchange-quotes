@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using ConstructionExchangeQuotes.Server.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace ConstructionExchangeQuotes.Server
@@ -24,6 +25,8 @@ namespace ConstructionExchangeQuotes.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<QuotesDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("QuotesDbContext")));
+
+            services.AddScoped<ElementRepository>();
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
