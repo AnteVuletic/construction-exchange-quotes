@@ -1,0 +1,9 @@
+C:\Users\Ante\source\repos\ConstructionExchangeQuotes\ConstructionExchangeQuotes\Shared\bin\Debug\netstandard2.1\ConstructionExchangeQuotes.Shared.deps.json
+C:\Users\Ante\source\repos\ConstructionExchangeQuotes\ConstructionExchangeQuotes\Shared\bin\Debug\netstandard2.1\ConstructionExchangeQuotes.Shared.dll
+C:\Users\Ante\source\repos\ConstructionExchangeQuotes\ConstructionExchangeQuotes\Shared\bin\Debug\netstandard2.1\ConstructionExchangeQuotes.Shared.pdb
+C:\Users\Ante\source\repos\ConstructionExchangeQuotes\ConstructionExchangeQuotes\Shared\obj\Debug\netstandard2.1\ConstructionExchangeQuotes.Shared.csprojAssemblyReference.cache
+C:\Users\Ante\source\repos\ConstructionExchangeQuotes\ConstructionExchangeQuotes\Shared\obj\Debug\netstandard2.1\ConstructionExchangeQuotes.Shared.AssemblyInfoInputs.cache
+C:\Users\Ante\source\repos\ConstructionExchangeQuotes\ConstructionExchangeQuotes\Shared\obj\Debug\netstandard2.1\ConstructionExchangeQuotes.Shared.AssemblyInfo.cs
+C:\Users\Ante\source\repos\ConstructionExchangeQuotes\ConstructionExchangeQuotes\Shared\obj\Debug\netstandard2.1\ConstructionExchangeQuotes.Shared.csproj.CoreCompileInputs.cache
+C:\Users\Ante\source\repos\ConstructionExchangeQuotes\ConstructionExchangeQuotes\Shared\obj\Debug\netstandard2.1\ConstructionExchangeQuotes.Shared.dll
+C:\Users\Ante\source\repos\ConstructionExchangeQuotes\ConstructionExchangeQuotes\Shared\obj\Debug\netstandard2.1\ConstructionExchangeQuotes.Shared.pdb
