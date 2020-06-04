@@ -4,6 +4,12 @@ namespace ConstructionExchangeQuotes.Shared
 {
     public class ElementDto
     {
+        public ElementDto()
+        {
+            ElementType = new ElementTypeDto();
+            ElementCategory = new ElementCategoryDto();
+            ElementFields = new List<ElementFieldDto>();
+        }
         public int? Id { get; set; }
         public string Name { get; set; }
         public double Rate { get; set; }

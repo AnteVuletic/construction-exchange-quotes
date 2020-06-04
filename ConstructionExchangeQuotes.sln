@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29920.165
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConstructionExchangeQuotes.Server", "ConstructionExchangeQuotes\Server\ConstructionExchangeQuotes.Server.csproj", "{B1946566-3972-4CB2-A7D1-E49B0F86B3EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConstructionExchangeQuotes.Server", "ConstructionExchangeQuotes\Server\ConstructionExchangeQuotes.Server.csproj", "{B1946566-3972-4CB2-A7D1-E49B0F86B3EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConstructionExchangeQuotes.Client", "ConstructionExchangeQuotes\Client\ConstructionExchangeQuotes.Client.csproj", "{B4753CD0-10D8-425B-A2F5-6BB656A5C802}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConstructionExchangeQuotes.Client", "ConstructionExchangeQuotes\Client\ConstructionExchangeQuotes.Client.csproj", "{B4753CD0-10D8-425B-A2F5-6BB656A5C802}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConstructionExchangeQuotes.Shared", "ConstructionExchangeQuotes\Shared\ConstructionExchangeQuotes.Shared.csproj", "{1A655835-4B34-4F2B-82C6-3FD081BFFAB8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConstructionExchangeQuotes.Shared", "ConstructionExchangeQuotes\Shared\ConstructionExchangeQuotes.Shared.csproj", "{1A655835-4B34-4F2B-82C6-3FD081BFFAB8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

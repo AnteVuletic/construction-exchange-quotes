@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using ConstructionExchangeQuotes.Server.Models;
 using ConstructionExchangeQuotes.Shared;
 
@@ -11,6 +12,15 @@ namespace ConstructionExchangeQuotes.Server.Repositories
         public ElementRepository(QuotesDbContext quotesDbContext)
         {
             _quotesDbContext = quotesDbContext;
+        }
+
+        public ICollection<ElementCategoryDto> GetElementCategories()
+        {
+            return this._quotesDbContext.ElementCategories.Select(x => new ElementCategoryDto
+            {
+                Id = x.Id,
+                Name = x.Name
+            }).ToList();
         }
 
         public bool AddElement(ElementDto elementDto)
@@ -45,8 +55,39 @@ namespace ConstructionExchangeQuotes.Server.Repositories
             var element = _quotesDbContext.Elements.Find(elementDto.Id);
             element.Name = elementDto.Name;
             element.Rate = elementDto.Rate;
+            element.ElementCategoryId = elementDto.ElementCategory.Id.Value;
+            element.ElementTypeId = elementDto.ElementType.Id.Value;
+
             var elementFieldsDeleted =
                 element.ElementFields.Where(x => elementDto.ElementFields.All(ef => (ef.Id ?? 0) != x.Id));
+            var elementsEdited =
+                element.ElementFields.Where(x => elementDto.ElementFields.Any(ef => (ef.Id ?? 0) == x.Id));
+
+            foreach (var elementField in elementsEdited)
+            {
+                var fieldEdited = elementDto.ElementFields.First(x => x.Id == elementField.Id);
+                elementField.Name = fieldEdited.Name;
+                elementField.Value = fieldEdited.Value;
+            }
+
+            var fieldsAdded = elementDto.ElementFields.Where(x => x.Id == 0).Select(x => new ElementField
+            {
+                Name = x.Name,
+                Value = x.Value,
+                Element = element
+            });
+
+            _quotesDbContext.ElementFields.AddRange(fieldsAdded);
+            _quotesDbContext.ElementFields.RemoveRange(elementFieldsDeleted);
+            _quotesDbContext.SaveChanges();
+            return true;
+        }
+
+        public void DeleteElement(int elementId)
+        {
+            var element = _quotesDbContext.Elements.Find(elementId);
+            _quotesDbContext.Elements.Remove(element);
+            _quotesDbContext.SaveChanges();
         }
 
         private bool IsElementValid(ElementDto elementDto)

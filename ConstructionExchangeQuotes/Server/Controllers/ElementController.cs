@@ -15,6 +15,12 @@ namespace ConstructionExchangeQuotes.Server.Controllers
             _elementRepository = elementRepository;
         }
 
+        [HttpGet("get-categories")]
+        public IActionResult GetCategories()
+        {
+            return Ok(_elementRepository.GetElementCategories());
+        }
+
         [HttpPost("add-element")]
         public IActionResult AddElement(ElementDto elementDto)
         {
@@ -35,6 +41,13 @@ namespace ConstructionExchangeQuotes.Server.Controllers
         public IActionResult AddType(ElementTypeDto elementTypeDto)
         {
             _elementRepository.AddElementType(elementTypeDto);
+            return Ok();
+        }
+
+        [HttpDelete("delete-element/{elementId:int}")]
+        public IActionResult DeleteElement(int elementId)
+        {
+            _elementRepository.DeleteElement(elementId);
             return Ok();
         }
 
@@ -59,7 +72,10 @@ namespace ConstructionExchangeQuotes.Server.Controllers
         [HttpPost("edit-element")]
         public IActionResult EditElement(ElementDto elementDto)
         {
-
+            var isValid = _elementRepository.EditElement(elementDto);
+            if (!isValid)
+                return BadRequest("Element invalid");
+            return Ok();
         }
 
         [HttpPost("edit-category")]
