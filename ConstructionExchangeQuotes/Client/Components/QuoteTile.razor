@@ -1,0 +1,46 @@
+﻿@using ConstructionExchangeQuotes.Shared
+
+@code{
+    [Parameter]
+    public QuoteDto Quote { get; set; }
+
+    private bool isExpanded = false;
+    private double total;
+
+    private void toggleExpand()
+    {
+        isExpanded = !isExpanded;
+    }
+
+    protected override void OnInitialized() =>
+        total = Quote.SubTotal + (Quote.SubTotal / Quote.TaxRatePercentage);
+}
+
+<div class="quote__tile">
+    <div class="tile__header" @onclick="toggleExpand">
+        <div class="tile__header__column">
+            <div>Date created: @Quote.DateCreated</div>
+            @if (Quote.CustomerEmail != null)
+            {
+                <div>Date created: @Quote.DateCreated</div>
+            }
+        </div>
+        <div class="tile__header__column">
+            <div>Subtotal: @Quote.SubTotal</div>
+            <div>Tax rate: @Quote.TaxRatePercentage%</div>
+            <div>Total: @total</div>
+        </div>
+    </div>
+    @if (isExpanded)
+    {
+        <div class="tile__content">
+            @foreach (var quoteElement in Quote.QuoteElements)
+            {
+            <div class="tile__content__item">
+                <div>@quoteElement.Element.Name</div>
+                <div>$@quoteElement.Element.Rate</div>
+            </div>
+            }
+        </div>
+    }
+</div>

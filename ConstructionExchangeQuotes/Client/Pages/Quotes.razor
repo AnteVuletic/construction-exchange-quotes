@@ -1,5 +1,29 @@
-﻿@page "/quotes"
+﻿@using System.Net.Http
+@using ConstructionExchangeQuotes.Shared
+@page "/quotes"
+@inject HttpClient Http
+
+@code {
+    private QuoteDto[] quotes;
+
+    protected override async Task OnInitializedAsync() =>
+    quotes = await Http.GetFromJsonAsync<QuoteDto[]>("quote/get");
+}
 
 <h1>Quotes</h1>
 
 <a href="quotes/create" class="btn btn-primary">Create</a>
+
+@if (quotes == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="quotes__list">
+        @foreach (var quote in quotes)
+        {
+            <QuoteTile Quote="quote" />
+        }
+    </div>
+}

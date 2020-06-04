@@ -27,6 +27,7 @@ namespace ConstructionExchangeQuotes.Server
             services.AddDbContext<QuotesDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("QuotesDbContext")));
 
             services.AddScoped<ElementRepository>();
+            services.AddScoped<QuoteRepository>();
             services.AddControllersWithViews();
             services.AddRazorPages();
         }

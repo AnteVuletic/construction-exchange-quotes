@@ -15,3 +15,35 @@
     color: white !important;
     cursor: pointer !important;
 }
+
+.quote__tile {
+    width: 100%;
+    margin: 16px;
+    padding: 16px;
+}
+
+.tile__header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.tile__header__column {
+    display: flex;
+    flex-direction: column;
+}
+
+.tile__content {
+    display: flex;
+    flex-direction: column;
+}
+
+.tile__content__item {
+    display: flex;
+    justify-content: space-between;
+}
+
+.quotes__list {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+}
