@@ -1,0 +1,17 @@
+﻿.nav-item .expandable {
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out max-height 0.2s ease-in-out;
+    max-height: 0;
+}
+
+.nav-item:hover .expandable {
+    max-height: 500px;
+    pointer-events: all;
+    opacity: 1;
+}
+
+.btn-primary {
+    color: white !important;
+    cursor: pointer !important;
+}
