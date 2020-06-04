@@ -10,6 +10,7 @@ namespace ConstructionExchangeQuotes.Server.Models
         public double TaxRatePercentage { get; set; }
         public DateTime DateCreated { get; set; }
         public string CustomerEmail { get; set; }
+        public bool IsArchived { get; set; }
 
         public ICollection<QuoteElement> QuoteElements { get; set; }
     }
