@@ -69,5 +69,18 @@ namespace ConstructionExchangeQuotes.Server.Controllers
 
             return Ok();
         }
+
+        [HttpPut("archive/{id:int}")]
+        public IActionResult ArchiveQuote(int id)
+        {
+            var IsArchiveSuccessful = _quoteRepository.ArchiveQuote(id);
+
+            if (!IsArchiveSuccessful)
+            {
+                return BadRequest();
+            }
+
+            return Ok();
+        }
     }
 }

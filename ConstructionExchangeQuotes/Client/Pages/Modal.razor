@@ -1,0 +1,42 @@
+﻿@code{
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+    [Parameter]
+    public EventCallback OnConfirm { get; set; }
+
+    public void HandleConfirm()
+    {
+        if (OnClose.HasDelegate)
+        {
+            OnClose.InvokeAsync(null);
+        }
+        if (OnConfirm.HasDelegate)
+        {
+            OnConfirm.InvokeAsync(null);
+        }
+    }
+}
+
+<div class="modal-wrapper">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Title</h5>
+                <button type="button" class="close" @onclick="OnClose">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @ChildContent
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick="HandleConfirm">OK</button>
+                <button type="button" class="btn btn-secondary" @onclick="OnClose">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

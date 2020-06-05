@@ -1,0 +1,28 @@
+﻿@code{
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string Description { get; set; }
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+    [Parameter]
+    public EventCallback OnConfirm { get; set; }
+
+    public void HandleConfirm()
+    {
+        if (OnClose.HasDelegate)
+        {
+            OnClose.InvokeAsync(null);
+        }
+        if (OnConfirm.HasDelegate)
+        {
+            OnConfirm.InvokeAsync(null);
+        }
+    }
+}
+
+<Modal Title="@Title"
+       OnClose="@OnClose"
+       OnConfirm="@OnConfirm">
+    <p>@Description</p>
+</Modal>

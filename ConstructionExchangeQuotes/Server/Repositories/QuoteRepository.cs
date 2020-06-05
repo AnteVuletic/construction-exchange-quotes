@@ -97,6 +97,22 @@ namespace ConstructionExchangeQuotes.Server.Repositories
             return quotes;
         }
 
+        public bool ArchiveQuote(int id)
+        {
+            var quoteToArchive = _context.Quotes.Find(id);
+
+            if (quoteToArchive == null || quoteToArchive.IsArchived)
+            {
+                return false;
+            }
+
+            quoteToArchive.IsArchived = false;
+
+            var changes = _context.SaveChanges();
+
+            return changes > 0;
+        }
+
         public bool DeleteQuote(int id)
         {
             var quoteToDelete = _context.Quotes.Find(id);

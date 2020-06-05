@@ -4,13 +4,18 @@
 @inject HttpClient Http
 
 @code {
-    private QuoteDto[] quotes;
+    private List<QuoteDto> quotes;
+    private bool isArchiveModalOpen = false;
+
+    private async Task FetchQuotes()
+    {
+        quotes = null;
+        quotes = await Http.GetFromJsonAsync<List<QuoteDto>>("quote/get");
+    }
 
     protected override async Task OnInitializedAsync() =>
-    quotes = await Http.GetFromJsonAsync<QuoteDto[]>("quote/get");
+        await FetchQuotes();
 }
-
-<h1>Quotes</h1>
 
 <a href="quotes/create" class="btn btn-primary">Create</a>
 
@@ -23,7 +28,7 @@ else
     <div class="quotes__list">
         @foreach (var quote in quotes)
         {
-            <QuoteTile Quote="quote" />
+            <QuoteTile Quote="quote" Refetch="@(async() => await FetchQuotes())" />
         }
     </div>
 }
