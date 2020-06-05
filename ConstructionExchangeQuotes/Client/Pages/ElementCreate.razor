@@ -3,7 +3,7 @@
 @inject HttpClient Http
 @using ConstructionExchangeQuotes.Shared
 
-<EditForm Model="@_elementDto">
+<EditForm Model="@_elementDto" OnValidSubmit="SaveElement">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <h4>Add Element</h4>
@@ -15,21 +15,21 @@
     </div>
     <div class="form-group">
         <label for="category">Category</label>
-        <InputSelect id="category" @bind-Value="_elementDto.ElementCategory" class="form-control">
+        <InputSelect id="category" @bind-Value="@_categoryId" class="form-control">
             <option value="">None</option>
             @foreach (var elementCat in _elementCategories)
             {
-                <option value="@elementCat">@elementCat.Name</option>
+                <option value="@elementCat.Id">@elementCat.Name</option>
             }
         </InputSelect>
     </div>
     <div class="form-group">
         <label for="type">Type</label>
-        <InputSelect id="type" @bind-Value="_elementDto.ElementType" class="form-control">
+        <InputSelect id="type" @bind-Value="@_elementTypeId" class="form-control">
             <option value="">None</option>
             @foreach (var elementType in _elementTypes)
             {
-                <option value="@elementType">@elementType.Name</option>
+                <option value="@elementType.Id">@elementType.Name</option>
             }
         </InputSelect>
     </div>
@@ -50,6 +50,8 @@
     private ElementDto _elementDto = new ElementDto();
     private ICollection<ElementCategoryDto> _elementCategories = new List<ElementCategoryDto>();
     private ICollection<ElementTypeDto> _elementTypes = new List<ElementTypeDto>();
+    private string _categoryId = string.Empty;
+    private string _elementTypeId = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -65,5 +67,15 @@
     void AddElementField()
     {
         _elementDto.ElementFields.Add(new ElementFieldDto());
+    }
+
+    async Task SaveElement()
+    {
+        _elementDto.ElementCategory = _elementCategories.Single(x => x.Id == int.Parse(_categoryId));
+        _elementDto.ElementType = _elementTypes.Single(x => x.Id == int.Parse(_elementTypeId));
+        await Http.PostAsJsonAsync("element/add-element", _elementDto);
+        _categoryId = string.Empty;
+        _elementTypeId = string.Empty;
+        _elementDto = new ElementDto();
     }
 }
