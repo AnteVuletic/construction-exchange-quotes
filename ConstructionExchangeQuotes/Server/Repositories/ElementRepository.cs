@@ -14,13 +14,22 @@ namespace ConstructionExchangeQuotes.Server.Repositories
             _quotesDbContext = quotesDbContext;
         }
 
-        public ICollection<ElementCategoryDto> GetElementCategories()
+        public IEnumerable<ElementCategoryDto> GetElementCategories()
         {
-            return this._quotesDbContext.ElementCategories.Select(x => new ElementCategoryDto
+            return _quotesDbContext.ElementCategories.Select(x => new ElementCategoryDto
             {
                 Id = x.Id,
                 Name = x.Name
-            }).ToList();
+            });
+        }
+
+        public IEnumerable<ElementTypeDto> GetElementTypes()
+        {
+            return _quotesDbContext.ElementTypes.Select(x => new ElementTypeDto
+            {
+                Id = x.Id,
+                Name = x.Name
+            });
         }
 
         public bool AddElement(ElementDto elementDto)

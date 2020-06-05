@@ -1,0 +1,58 @@
+﻿@page "/element/create"
+
+@inject HttpClient Http
+@using ConstructionExchangeQuotes.Shared
+
+<EditForm Model="ElementDto">
+    <label>Element name</label>
+    <input type="text" value="@ElementDto.Name"/>
+    <label>Rate</label>
+    <input type="number" value="@ElementDto.Rate"/>
+    <label>Category</label>
+    <select value="@ElementDto.ElementCategory">
+        <option value="-1">None</option>
+        @foreach (var elementCat in ElementCategories)
+        {
+            <option value="@elementCat" @onclick="() => CategoryPicked(elementCat)">@elementCat.Name</option>
+        }
+    </select>
+    <label>Type</label>
+    <select value="@ElementDto.ElementType">
+        <option value="-1">None</option>
+        @foreach (var elementType in ElementTypes)
+        {
+            <option value="@elementType" @onclick="() => ElementTypePicked(elementType)">@elementType.Name</option>
+        }
+    </select>
+</EditForm>
+
+@code {
+    public ElementDto ElementDto { get; set; }
+    public ICollection<ElementCategoryDto> ElementCategories { get; set; }
+    public ICollection<ElementTypeDto> ElementTypes { get; set; }
+
+    protected override void OnInitialized()
+    {
+        ElementDto = new ElementDto();
+        ElementCategories = new List<ElementCategoryDto>();
+        ElementTypes = new List<ElementTypeDto>();
+        base.OnInitialized();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        ElementCategories = await Http.GetFromJsonAsync<ICollection<ElementCategoryDto>>("element/get-categories");
+        ElementTypes = await Http.GetFromJsonAsync<ICollection<ElementTypeDto>>("element/get-types");
+    }
+
+    public void CategoryPicked(ElementCategoryDto elementCategoryDto)
+    {
+        this.ElementDto.ElementCategory = elementCategoryDto;
+    }
+
+    public void ElementTypePicked(ElementTypeDto elementTypeDto)
+    {
+        this.ElementDto.ElementType = elementTypeDto;
+    }
+}

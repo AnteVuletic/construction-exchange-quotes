@@ -8,11 +8,13 @@ using Microsoft.Extensions.Hosting;
 using System.Linq;
 using ConstructionExchangeQuotes.Server.Repositories;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace ConstructionExchangeQuotes.Server
 {
     public class Startup
     {
+        readonly string AllowCors = "_allowCors";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -28,6 +30,15 @@ namespace ConstructionExchangeQuotes.Server
 
             services.AddScoped<ElementRepository>();
             services.AddScoped<QuoteRepository>();
+            services.AddCors(options =>
+            {
+                options.AddPolicy(AllowCors, builder =>
+                {
+                    builder.WithOrigins("http://localhost.com", "https://localhost.com")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                });
+            });
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
@@ -50,6 +61,8 @@ namespace ConstructionExchangeQuotes.Server
             app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();
+
+            app.UseCors(AllowCors);
 
             app.UseRouting();
 

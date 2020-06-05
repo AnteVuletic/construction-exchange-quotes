@@ -1,0 +1,62 @@
+﻿@page "/element-type"
+@using ConstructionExchangeQuotes.Shared
+@inject HttpClient Http
+
+<EditForm Model="@_elementTypeDto" OnValidSubmit="CreateElementType" class="mb-5">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <h4>Add element type</h4>
+    <div class="form-group">
+        <label for="name">Name</label>
+        <InputText id="name" @bind-Value="_elementTypeDto.Name" class="form-control" />
+    </div>
+    <div class="d-flex w-100 justify-content-center">
+        <button type="submit" class="btn btn-primary">Create</button>
+    </div>
+</EditForm>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var elementType in _elementTypes)
+        {
+            <tr>
+                <th scope="row">@elementType.Id</th>
+                <td>@elementType.Name</td>
+                <td>
+                    <button class="btn btn-danger">Delete</button>
+                    <button class="btn btn-secondary">Edit</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private ElementTypeDto _elementTypeDto = new ElementTypeDto();
+    private IList<ElementTypeDto> _elementTypes = new List<ElementTypeDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitializeElementTypes();
+    }
+
+    public async Task InitializeElementTypes()
+    {
+        _elementTypes = await Http.GetFromJsonAsync<IList<ElementTypeDto>>("element/get-element-types");
+    }
+
+    public async void CreateElementType()
+    {
+        await Http.PostAsJsonAsync("element/add-type", _elementTypeDto);
+
+        _elementTypeDto = new ElementTypeDto();
+        await this.InitializeElementTypes();
+    }
+}
