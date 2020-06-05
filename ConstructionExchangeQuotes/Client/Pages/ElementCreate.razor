@@ -3,56 +3,67 @@
 @inject HttpClient Http
 @using ConstructionExchangeQuotes.Shared
 
-<EditForm Model="ElementDto">
-    <label>Element name</label>
-    <input type="text" value="@ElementDto.Name"/>
-    <label>Rate</label>
-    <input type="number" value="@ElementDto.Rate"/>
-    <label>Category</label>
-    <select value="@ElementDto.ElementCategory">
-        <option value="-1">None</option>
-        @foreach (var elementCat in ElementCategories)
+<EditForm Model="@_elementDto">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <h4>Add Element</h4>
+    <div class="form-group">
+        <label for="name">Element name</label>
+        <InputText id="name" @bind-Value="_elementDto.Name" class="form-control" />
+        <label for="rate" class="mt-2">Rate</label>
+        <InputNumber id="rate" @bind-Value="_elementDto.Rate" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="category">Category</label>
+        <InputSelect id="category" @bind-Value="_elementDto.ElementCategory" class="form-control">
+            <option value="">None</option>
+            @foreach (var elementCat in _elementCategories)
+            {
+                <option value="@elementCat">@elementCat.Name</option>
+            }
+        </InputSelect>
+    </div>
+    <div class="form-group">
+        <label for="type">Type</label>
+        <InputSelect id="type" @bind-Value="_elementDto.ElementType" class="form-control">
+            <option value="">None</option>
+            @foreach (var elementType in _elementTypes)
+            {
+                <option value="@elementType">@elementType.Name</option>
+            }
+        </InputSelect>
+    </div>
+    <div class="form-group">
+        <label for="element-fields" class="d-block">Element fields</label>
+        @foreach (var elementField in _elementDto.ElementFields)
         {
-            <option value="@elementCat" @onclick="() => CategoryPicked(elementCat)">@elementCat.Name</option>
+            <ElementFieldEditor ElementField="elementField" OnElementFieldDeleted="ElementFieldDeleted" IsFirst="_elementDto.ElementFields.First() == elementField"/>
         }
-    </select>
-    <label>Type</label>
-    <select value="@ElementDto.ElementType">
-        <option value="-1">None</option>
-        @foreach (var elementType in ElementTypes)
-        {
-            <option value="@elementType" @onclick="() => ElementTypePicked(elementType)">@elementType.Name</option>
-        }
-    </select>
+        <button type="button" class="btn btn-primary w-100 d-block" @onclick="AddElementField">Add element field</button>
+    </div>
+    <div class="d-flex w-100 justify-content-center">
+        <button type="submit" class="btn btn-primary">Create</button>
+    </div>
 </EditForm>
 
 @code {
-    public ElementDto ElementDto { get; set; }
-    public ICollection<ElementCategoryDto> ElementCategories { get; set; }
-    public ICollection<ElementTypeDto> ElementTypes { get; set; }
-
-    protected override void OnInitialized()
-    {
-        ElementDto = new ElementDto();
-        ElementCategories = new List<ElementCategoryDto>();
-        ElementTypes = new List<ElementTypeDto>();
-        base.OnInitialized();
-    }
+    private ElementDto _elementDto = new ElementDto();
+    private ICollection<ElementCategoryDto> _elementCategories = new List<ElementCategoryDto>();
+    private ICollection<ElementTypeDto> _elementTypes = new List<ElementTypeDto>();
 
     protected override async Task OnInitializedAsync()
     {
-
-        ElementCategories = await Http.GetFromJsonAsync<ICollection<ElementCategoryDto>>("element/get-categories");
-        ElementTypes = await Http.GetFromJsonAsync<ICollection<ElementTypeDto>>("element/get-types");
+        _elementCategories = await Http.GetFromJsonAsync<ICollection<ElementCategoryDto>>("element/get-categories");
+        _elementTypes = await Http.GetFromJsonAsync<ICollection<ElementTypeDto>>("element/get-element-types");
     }
 
-    public void CategoryPicked(ElementCategoryDto elementCategoryDto)
+    void ElementFieldDeleted(ElementFieldDto elementField)
     {
-        this.ElementDto.ElementCategory = elementCategoryDto;
+        _elementDto.ElementFields.Remove(elementField);
     }
 
-    public void ElementTypePicked(ElementTypeDto elementTypeDto)
+    void AddElementField()
     {
-        this.ElementDto.ElementType = elementTypeDto;
+        _elementDto.ElementFields.Add(new ElementFieldDto());
     }
 }

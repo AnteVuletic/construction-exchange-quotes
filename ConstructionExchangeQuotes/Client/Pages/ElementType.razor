@@ -30,7 +30,7 @@
                 <th scope="row">@elementType.Id</th>
                 <td>@elementType.Name</td>
                 <td>
-                    <button class="btn btn-danger">Delete</button>
+                    <button class="btn btn-danger" @onclick="async () => await DeleteElementType(elementType.Id)">Delete</button>
                     <button class="btn btn-secondary">Edit</button>
                 </td>
             </tr>
@@ -52,11 +52,17 @@
         _elementTypes = await Http.GetFromJsonAsync<IList<ElementTypeDto>>("element/get-element-types");
     }
 
-    public async void CreateElementType()
+    public async Task CreateElementType()
     {
         await Http.PostAsJsonAsync("element/add-type", _elementTypeDto);
 
         _elementTypeDto = new ElementTypeDto();
         await this.InitializeElementTypes();
+    }
+
+    public async Task DeleteElementType(int? elementId)
+    {
+        await Http.DeleteAsync($"element/delete-type/{elementId.Value}");
+        await InitializeElementTypes();
     }
 }

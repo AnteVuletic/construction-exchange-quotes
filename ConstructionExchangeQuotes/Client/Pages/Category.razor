@@ -1,0 +1,68 @@
+﻿@page "/category"
+@using ConstructionExchangeQuotes.Shared
+@inject HttpClient Http
+
+<EditForm Model="@_elementCategory" OnValidSubmit="CreateCategory" class="mb-5">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <h4>Add category type</h4>
+    <div class="form-group">
+        <label for="name">Name</label>
+        <InputText id="name" @bind-Value="_elementCategory.Name" class="form-control" />
+    </div>
+    <div class="d-flex w-100 justify-content-center">
+        <button type="submit" class="btn btn-primary">Create</button>
+    </div>
+</EditForm>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var elementType in _elementCategories)
+        {
+            <tr>
+                <th scope="row">@elementType.Id</th>
+                <td>@elementType.Name</td>
+                <td>
+                    <button class="btn btn-danger" @onclick="async () => await DeleteCategory(elementType.Id)">Delete</button>
+                    <button class="btn btn-secondary">Edit</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private ElementCategoryDto _elementCategory = new ElementCategoryDto();
+    private IList<ElementCategoryDto> _elementCategories = new List<ElementCategoryDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitializeCategories();
+    }
+
+    public async Task InitializeCategories()
+    {
+        _elementCategories = await Http.GetFromJsonAsync<IList<ElementCategoryDto>>("element/get-categories");
+    }
+
+    public async Task CreateCategory()
+    {
+        await Http.PostAsJsonAsync("element/add-category", _elementCategory);
+
+        _elementCategory = new ElementCategoryDto();
+        await this.InitializeCategories();
+    }
+
+    public async Task DeleteCategory(int? id)
+    {
+        await Http.DeleteAsync($"element/delete-category/{id.Value}");
+        await InitializeCategories();
+    }
+}

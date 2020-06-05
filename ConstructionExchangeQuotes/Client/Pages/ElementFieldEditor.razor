@@ -1,0 +1,37 @@
+﻿@using ConstructionExchangeQuotes.Shared 
+
+<div class="form-group">
+    <div class="container">
+        @if (IsFirst)
+        {
+            <div class="row">
+                <label for="name" class="col-4">Name</label>
+                <label for="value" class="col-4">Value</label>
+            </div>
+        }
+        <div class="row">
+            <InputText for="name" @bind-Value="ElementField.Name" class="col-4 form-control"></InputText>
+            <InputText for="value" @bind-Value="ElementField.Value" class="col-4 form-control"></InputText>
+            <button class="btn btn-danger col-3" @onclick="DeleteItem">Delete</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ElementFieldDto ElementField { get; set; }
+
+    [Parameter]
+    public EventCallback<ElementFieldDto> OnElementFieldDeleted { get; set; }
+
+    [Parameter]
+    public bool IsFirst { get; set; }
+
+    public void DeleteItem(MouseEventArgs mouseEventArgs)
+    {
+        if (OnElementFieldDeleted.HasDelegate)
+        {
+            OnElementFieldDeleted.InvokeAsync(ElementField);
+        }
+    }
+}
