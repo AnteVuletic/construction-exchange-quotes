@@ -1,6 +1,5 @@
 ﻿using ConstructionExchangeQuotes.Server.Models;
 using ConstructionExchangeQuotes.Server.Repositories;
-using ConstructionExchangeQuotes.Shared;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;

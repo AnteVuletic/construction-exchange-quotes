@@ -1,0 +1,79 @@
+﻿@using ConstructionExchangeQuotes.Shared
+@using System.Net.Http
+@inject HttpClient Http
+
+@code {
+    [Parameter]
+    public QuoteElementDto QuoteElement { get; set; }
+    [Parameter]
+    public List<ElementDto> ForbiddenElements { get; set; }
+    [Parameter]
+    public EventCallback<QuoteElementDto> OnElementFieldDeleted { get; set; }
+    [Parameter]
+    public bool IsFirst { get; set; }
+
+    private ElementDto selectedElement;
+    private List<ElementDto> availableElements = new List<ElementDto>();
+
+    private async Task FetchElements()
+    {
+        availableElements = new List<ElementDto>();
+        //var allElements = await Http.GetFromJsonAsync<ICollection<ElementDto>>("element/get");
+
+        //availableElements = allElements.Where(e => !ForbiddenElements.Contains(e)).ToList();
+
+        availableElements = await Http.GetFromJsonAsync<List<ElementDto>>("element/get");
+    }
+
+    protected override async Task OnInitializedAsync() =>
+        await FetchElements();
+
+    public void DeleteItem()
+    {
+        if (OnElementFieldDeleted.HasDelegate)
+        {
+            OnElementFieldDeleted.InvokeAsync(QuoteElement);
+        }
+    }
+
+    public void HandleUpdateElement(ChangeEventArgs args)
+    {
+        if(args.Value.ToString() == "none")
+        {
+            QuoteElement.ElementId = 0;
+            QuoteElement.Element = null;
+        }
+        QuoteElement.ElementId =int.Parse(args.Value.ToString());
+        QuoteElement.Element = availableElements.FirstOrDefault(qe => qe.Id == QuoteElement.ElementId);
+    }
+}
+
+<div class="form-group">
+    <div class="container">
+        @if (IsFirst)
+        {
+        <div class="row">
+            <label for="name" class="col-6">Name</label>
+            <label for="amount" class="col-2">Amount</label>
+            <label for="rate" class="col-1">Rate</label>
+            <label for="sum" class="col-2">Sum</label>
+            <label class="col-1"></label>
+        </div>
+        }
+    <div class="row">
+        <select id="type" class="form-control col-6" @onchange="HandleUpdateElement">
+            <option value="none">None</option>
+            @foreach (var element in availableElements)
+            {
+                <option value="@element.Id">@element.Name [@element.ElementType.Name - @element.ElementCategory.Name]</option>
+            }
+        </select>
+        <input type="number" for="amount" @bind="QuoteElement.Amount" class="col-2" />
+        <p for="rate" class="col-1">$@QuoteElement.Element.Rate</p>
+        <p for="sum" class="col-2">$@(QuoteElement.Element.Rate * QuoteElement.Amount)</p>
+        <button type="button" class="close col-1" aria-label="Close" @onclick="DeleteItem">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    </div>
+</div>

@@ -1,0 +1,62 @@
+﻿@page "/quotes/create"
+@using System.Net.Http
+@using ConstructionExchangeQuotes.Shared
+@inject HttpClient Http
+
+@code{
+    private double taxRatePercentage = 0;
+    private string customerEmail = "";
+    private List<QuoteElementDto> quoteElements = new List<QuoteElementDto>();
+
+    public void handleAddQuoteElement()
+    {
+        var quoteElement = new QuoteElementDto();
+        quoteElement.Element = new ElementDto();
+        quoteElements.Add(quoteElement);
+    }
+
+    protected override void OnInitialized()
+    {
+        handleAddQuoteElement();
+    }
+
+    public void handleRemoveQuoteElement(QuoteElementDto quoteElement)
+    {
+        quoteElements.Remove(quoteElement);
+    }
+
+    public double SubTotal()
+    {
+        return quoteElements.Sum(qe => qe.Amount * qe.Element.Rate);
+    }
+
+    public double Total()
+    {
+        var subtotal = SubTotal();
+        return subtotal + (subtotal * taxRatePercentage);
+    }
+}
+
+<div>
+    <h4>Add Quote</h4>
+    <div class="form-group">
+        @foreach (var quoteElement in quoteElements)
+        {
+            <QuoteElementEditor QuoteElement="quoteElement"
+                                ForbiddenElements="quoteElements.Select(qe => qe.Element).ToList()"
+                                OnElementFieldDeleted="handleRemoveQuoteElement"
+                                IsFirst="quoteElements.First() == quoteElement" />
+        }
+        <button type="button" class="btn btn-primary w-100 d-block" @onclick="handleAddQuoteElement">Add element</button>
+    </div>
+    <div class="form-group">
+        <label for="subTotal">Subtotal</label>
+        <p for="subTotal">$@(SubTotal())</p>
+        <label for="taxRate">Tax rate</label>
+        <input type="number" id="taxRate" @bind="taxRatePercentage" class="form-control" />
+        <label for="subTotal">Total</label>
+        <p for="subTotal">$@(Total())</p>
+        <label for="customerEmail">Customer email</label>
+        <input type="text" id="customerEmail" @bind="customerEmail" class="form-control" />
+    </div>
+</div>

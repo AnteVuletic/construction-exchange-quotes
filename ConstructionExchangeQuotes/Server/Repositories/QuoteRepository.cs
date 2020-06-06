@@ -27,12 +27,19 @@ namespace ConstructionExchangeQuotes.Server.Repositories
                 TaxRatePercentage = taxRatePercentage,
                 DateCreated = dateCreated,
                 CustomerEmail = customerEmail,
-                QuoteElements = quoteElements,
                 IsArchived = false
             };
 
             var addedQuote = _context.Quotes.Add(quoteToAdd);
 
+            _context.SaveChanges();
+
+            foreach (var quoteElement in quoteElements)
+            {
+                quoteElement.QuoteId = addedQuote.Entity.Id;
+            }
+
+            _context.QuoteElements.AddRange(quoteElements);
             _context.SaveChanges();
 
             return addedQuote.Entity;
