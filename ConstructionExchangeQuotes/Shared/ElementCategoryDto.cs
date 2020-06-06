@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace ConstructionExchangeQuotes.Shared
 {
@@ -9,5 +10,10 @@ namespace ConstructionExchangeQuotes.Shared
         [Required]
         [MinLength(3, ErrorMessage = "Minimum category name is 3 characters")]
         public string Name { get; set; }
+
+        public ElementCategoryDto CloneObject()
+        {
+            return (ElementCategoryDto)this.MemberwiseClone();
+        }
     }
 }

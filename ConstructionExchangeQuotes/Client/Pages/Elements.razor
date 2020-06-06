@@ -1,0 +1,26 @@
+﻿@page "/elements"
+
+@using ConstructionExchangeQuotes.Shared
+@inject HttpClient Http
+
+<h1>Element</h1>
+
+<div class="d-flex justify-content-end w-100">
+    <a href="element/create" class="btn btn-primary">Create</a>
+</div>
+
+<div class="card-columns">
+    @foreach (var element in _elements)
+    {
+        <RenderElement Element="element" />
+    }
+</div>
+
+@code {
+    private IList<ElementDto> _elements = new List<ElementDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _elements = await Http.GetFromJsonAsync<IList<ElementDto>>("element/get");
+    }
+}

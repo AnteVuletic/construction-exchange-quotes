@@ -27,6 +27,12 @@ namespace ConstructionExchangeQuotes.Server.Controllers
             return Ok(_elementRepository.GetElementTypes());
         }
 
+        [HttpGet("get")]
+        public IActionResult GetElements()
+        {
+            return Ok(_elementRepository.GetElements());
+        }
+
         [HttpPost("add-element")]
         public IActionResult AddElement(ElementDto elementDto)
         {

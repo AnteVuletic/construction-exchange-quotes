@@ -2,6 +2,24 @@
 @using ConstructionExchangeQuotes.Shared
 @inject HttpClient Http
 
+@if (_elementCategoryInEdit != null)
+{
+    <Modal Title="Edit element category" OnClose="CancelElementCategoryEdit" OnConfirm="OnConfirmEditCategory" ShouldRenderButtons="false">
+        <EditForm Model="@_elementCategoryInEdit" OnValidSubmit="OnConfirmEditCategory" class="mb-5">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label for="name">Name</label>
+                <InputText id="name" @bind-Value="_elementCategoryInEdit.Name" class="form-control" />
+            </div>
+            <div class="d-flex w-100 justify-content-around">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-danger" @onclick="CancelElementCategoryEdit">Cancel</button>
+            </div>
+        </EditForm>
+    </Modal>
+}
+
 <EditForm Model="@_elementCategory" OnValidSubmit="CreateCategory" class="mb-5">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -31,7 +49,7 @@
                 <td>@elementType.Name</td>
                 <td>
                     <button class="btn btn-danger" @onclick="async () => await DeleteCategory(elementType.Id)">Delete</button>
-                    <button class="btn btn-secondary">Edit</button>
+                    <button class="btn btn-secondary" @onclick="() => _elementCategoryInEdit = elementType.CloneObject()">Edit</button>
                 </td>
             </tr>
         }
@@ -41,6 +59,7 @@
 @code {
     private ElementCategoryDto _elementCategory = new ElementCategoryDto();
     private IList<ElementCategoryDto> _elementCategories = new List<ElementCategoryDto>();
+    private ElementCategoryDto _elementCategoryInEdit;
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,5 +83,17 @@
     {
         await Http.DeleteAsync($"element/delete-category/{id.Value}");
         await InitializeCategories();
+    }
+
+    async Task OnConfirmEditCategory()
+    {
+        await Http.PostAsJsonAsync($"element/edit-category", _elementCategoryInEdit);
+        _elementCategoryInEdit = null;
+        await InitializeCategories();
+    }
+
+    void CancelElementCategoryEdit()
+    {
+        _elementCategoryInEdit = null;
     }
 }

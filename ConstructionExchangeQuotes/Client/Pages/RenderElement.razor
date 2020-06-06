@@ -1,0 +1,44 @@
+﻿@using ConstructionExchangeQuotes.Shared
+
+<div class="card">
+    <h5 class="card-header">
+        @Element.Name
+    </h5>
+    <div class="card-body">
+        <div class="card-text">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Rate</th>
+                        <th>Category</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            @Element.Rate $
+                        </td>
+                        <td>
+                            @Element.ElementCategory.Name
+                        </td>
+                        <td>
+                            @Element.ElementType.Name
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <ul class="list-group">
+        @foreach (var elementField in Element.ElementFields)
+        {
+            <li class="list-group-item">@elementField.Name - @elementField.Value</li>
+        }
+    </ul>
+</div>
+
+@code {
+    [Parameter]
+    public ElementDto Element { get; set; }
+}

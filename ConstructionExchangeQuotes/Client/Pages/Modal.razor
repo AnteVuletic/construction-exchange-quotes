@@ -7,6 +7,8 @@
     public EventCallback OnClose { get; set; }
     [Parameter]
     public EventCallback OnConfirm { get; set; }
+    [Parameter]
+    public bool ShouldRenderButtons { get; set; } = true;
 
     public void HandleConfirm()
     {
@@ -33,10 +35,13 @@
             <div class="modal-body">
                 @ChildContent
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" @onclick="HandleConfirm">OK</button>
-                <button type="button" class="btn btn-secondary" @onclick="OnClose">Cancel</button>
-            </div>
+            @if (ShouldRenderButtons)
+            {
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" @onclick="HandleConfirm">OK</button>
+                    <button type="button" class="btn btn-secondary" @onclick="OnClose">Cancel</button>
+                </div>
+            }
         </div>
     </div>
 </div>

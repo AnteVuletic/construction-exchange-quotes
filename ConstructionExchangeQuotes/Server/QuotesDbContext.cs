@@ -7,7 +7,6 @@ namespace ConstructionExchangeQuotes.Server
     {
         public QuotesDbContext(DbContextOptions options) : base(options)
         {
-            
         }
 
         public DbSet<Element> Elements { get; set; }

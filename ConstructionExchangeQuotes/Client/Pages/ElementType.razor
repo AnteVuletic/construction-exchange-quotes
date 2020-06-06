@@ -2,6 +2,24 @@
 @using ConstructionExchangeQuotes.Shared
 @inject HttpClient Http
 
+@if (_elementTypeInEdit != null)
+{
+    <Modal Title="Edit element type" OnClose="CancelElementTypeEdit" ShouldRenderButtons="false">
+        <EditForm Model="@_elementTypeInEdit" OnValidSubmit="OnConfirmEditCategory" class="mb-5">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label for="name">Name</label>
+                <InputText id="name" @bind-Value="_elementTypeInEdit.Name" class="form-control" />
+            </div>
+            <div class="d-flex w-100 justify-content-around">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-danger" @onclick="CancelElementTypeEdit">Cancel</button>
+            </div>
+        </EditForm>
+    </Modal>
+}
+
 <EditForm Model="@_elementTypeDto" OnValidSubmit="CreateElementType" class="mb-5">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -31,7 +49,7 @@
                 <td>@elementType.Name</td>
                 <td>
                     <button class="btn btn-danger" @onclick="async () => await DeleteElementType(elementType.Id)">Delete</button>
-                    <button class="btn btn-secondary">Edit</button>
+                    <button class="btn btn-secondary" @onclick="() => _elementTypeInEdit = elementType.CloneObject()">Edit</button>
                 </td>
             </tr>
         }
@@ -41,6 +59,7 @@
 @code {
     private ElementTypeDto _elementTypeDto = new ElementTypeDto();
     private IList<ElementTypeDto> _elementTypes = new List<ElementTypeDto>();
+    private ElementTypeDto _elementTypeInEdit;
 
     protected override async Task OnInitializedAsync()
     {
@@ -58,6 +77,18 @@
 
         _elementTypeDto = new ElementTypeDto();
         await this.InitializeElementTypes();
+    }
+
+    async Task OnConfirmEditCategory()
+    {
+        await Http.PostAsJsonAsync("element/edit-type", _elementTypeInEdit);
+        _elementTypeInEdit = null;
+        await InitializeElementTypes();
+    }
+
+    void CancelElementTypeEdit()
+    {
+        _elementTypeInEdit = null;
     }
 
     public async Task DeleteElementType(int? elementId)

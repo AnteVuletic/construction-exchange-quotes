@@ -32,6 +32,29 @@ namespace ConstructionExchangeQuotes.Server.Repositories
             });
         }
 
+        public IEnumerable<ElementDto> GetElements()
+        {
+            return _quotesDbContext.Elements.Select(x => new ElementDto
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Rate = x.Rate,
+                ElementCategory = new ElementCategoryDto { 
+                    Id = x.ElementCategory.Id,
+                    Name = x.ElementCategory.Name
+                },
+                ElementType = new ElementTypeDto { 
+                    Id = x.ElementType.Id,
+                    Name = x.ElementType.Name
+                },
+                ElementFields = x.ElementFields.Select(ef => new ElementFieldDto { 
+                    Id = ef.Id,
+                    Name = ef.Name,
+                    Value = ef.Value
+                }).ToList()
+            });
+        }
+
         public bool AddElement(ElementDto elementDto)
         {
             var isElementValid = IsElementValid(elementDto);
@@ -52,6 +75,7 @@ namespace ConstructionExchangeQuotes.Server.Repositories
             };
 
             _quotesDbContext.Elements.Add(element);
+            _quotesDbContext.SaveChanges();
             return true;
         }
 
@@ -61,7 +85,7 @@ namespace ConstructionExchangeQuotes.Server.Repositories
             if (!isElementValid)
                 return false;
 
-            var element = _quotesDbContext.Elements.Find(elementDto.Id);
+            var element = _quotesDbContext.Elements.Find(elementDto.Id.Value);
             element.Name = elementDto.Name;
             element.Rate = elementDto.Rate;
             element.ElementCategoryId = elementDto.ElementCategory.Id.Value;
@@ -131,8 +155,8 @@ namespace ConstructionExchangeQuotes.Server.Repositories
 
         public void EditElementCategory(ElementCategoryDto elementCategoryDto)
         {
-            var elementCategory = _quotesDbContext.ElementCategories.Find(elementCategoryDto.Id);
-            elementCategory.Name = elementCategory.Name;
+            var elementCategory = _quotesDbContext.ElementCategories.Find(elementCategoryDto.Id.Value);
+            elementCategory.Name = elementCategoryDto.Name;
 
             _quotesDbContext.SaveChanges();
         }
@@ -163,8 +187,8 @@ namespace ConstructionExchangeQuotes.Server.Repositories
 
         public void EditElementType(ElementTypeDto elementTypeDto)
         {
-            var elementType = _quotesDbContext.ElementTypes.Find(elementTypeDto.Id);
-            elementType.Name = elementType.Name;
+            var elementType = _quotesDbContext.ElementTypes.Find(elementTypeDto.Id.Value);
+            elementType.Name = elementTypeDto.Name;
 
             _quotesDbContext.SaveChanges();
         }
