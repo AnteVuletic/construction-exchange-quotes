@@ -6,12 +6,11 @@
     [Parameter]
     public EventCallback Refetch { get; set; }
 
-    private bool isExpanded = false;
     private bool isArchiveModalOpen = false;
     private double total;
 
     protected override void OnInitialized() =>
-        total = Quote.SubTotal + (Quote.SubTotal / Quote.TaxRatePercentage);
+        total = Quote.SubTotal + (Quote.SubTotal * (Quote.TaxRatePercentage / 100));
 }
 
 @if (isArchiveModalOpen)
@@ -22,36 +21,55 @@
                  OnConfirm="@(async() => await Refetch.InvokeAsync(null))" />
 }
 
-<div class="quote__tile">
-    <div class="tile__header" @onclick="@(() => isExpanded = !isExpanded)">
-        <div class="tile__header__column">
-            <div>Date created: @Quote.DateCreated</div>
-            @if (Quote.CustomerEmail != null)
-            {
-                <div>Date created: @Quote.DateCreated</div>
-            }
-        </div>
-        <div class="tile__header__column">
-            <div>
-                Subtotal: @Quote.SubTotal
-                <button type="button" class="close" aria-label="Close" @onclick="@(() => isArchiveModalOpen = true)">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div>Tax rate: @Quote.TaxRatePercentage%</div>
-            <div>Total: @total</div>
-        </div>
+<div class="card">
+    <div class="card-header">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Rate</th>
+                    <th>Amount</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var quoteElement in Quote.QuoteElements)
+                {
+                    <tr>
+                        <td>@quoteElement.Element.Name</td>
+                        <td>$@quoteElement.Element.Rate</td>
+                        <td>@quoteElement.Amount</td>
+                        <td>$@(quoteElement.Amount * quoteElement.Element.Rate)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <button type="button" class="close" aria-label="Close" @onclick="@(() => isArchiveModalOpen = true)">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
-    @if (isExpanded)
-    {
-        <div class="tile__content">
-            @foreach (var quoteElement in Quote.QuoteElements)
-            {
-                <div class="tile__content__item">
-                    <div>@quoteElement.Element.Name</div>
-                    <div>$@quoteElement.Element.Rate</div>
-                </div>
-            }
-        </div>
-    }
+    <div class="card-body">
+        <table class="table table-bordered">
+            <tbody>
+                <tr>
+                    <td>Subtotal - @Quote.SubTotal</td>
+                </tr>
+                <tr>
+                    <td>Tax rate - @Quote.TaxRatePercentage%</td>
+                </tr>
+                <tr>
+                    <td>Total - @total</td>
+                </tr>
+                <tr>
+                    <td>Date created - @Quote.DateCreated</td>
+                </tr>
+                @if (Quote.CustomerEmail != null)
+                {
+                    <tr>
+                        <td>Customer email - @Quote.CustomerEmail</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>

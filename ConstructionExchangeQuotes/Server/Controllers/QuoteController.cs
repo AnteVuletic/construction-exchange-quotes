@@ -1,11 +1,7 @@
-﻿using ConstructionExchangeQuotes.Server.Models;
-using ConstructionExchangeQuotes.Server.Repositories;
+﻿using ConstructionExchangeQuotes.Server.Repositories;
 using ConstructionExchangeQuotes.Shared;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 
 namespace ConstructionExchangeQuotes.Server.Controllers
 {

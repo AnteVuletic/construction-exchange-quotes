@@ -59,6 +59,7 @@ namespace ConstructionExchangeQuotes.Server.Repositories
         {
             var quotes = _context.Quotes
                     .Include(q => q.QuoteElements)
+                    .ThenInclude(qe => qe.Element)
                     .OrderByDescending(q => q.DateCreated)
                     .Where(q => q.IsArchived == false)
                     .ToList();
@@ -68,6 +69,7 @@ namespace ConstructionExchangeQuotes.Server.Repositories
                 foreach (var quoteElement in quote.QuoteElements)
                 {
                     quoteElement.Quote = null;
+                    quoteElement.Element.QuoteElements = null;
                 }
             }
 
