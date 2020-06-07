@@ -61,7 +61,7 @@ namespace ConstructionExchangeQuotes.Server.Repositories
                     .Include(q => q.QuoteElements)
                     .ThenInclude(qe => qe.Element)
                     .OrderByDescending(q => q.DateCreated)
-                    .Where(q => q.IsArchived == false)
+                    .Where(q => !q.IsArchived)
                     .ToList();
 
             foreach (var quote in quotes)
@@ -80,8 +80,9 @@ namespace ConstructionExchangeQuotes.Server.Repositories
         {
             var quotes = _context.Quotes
                     .Include(q => q.QuoteElements)
+                    .ThenInclude(qe => qe.Element)
                     .OrderByDescending(q => q.DateCreated)
-                    .Where(q => q.IsArchived == false)
+                    .Where(q => q.IsArchived)
                     .ToList();
 
             foreach (var quote in quotes)
@@ -89,6 +90,7 @@ namespace ConstructionExchangeQuotes.Server.Repositories
                 foreach (var quoteElement in quote.QuoteElements)
                 {
                     quoteElement.Quote = null;
+                    quoteElement.Element.QuoteElements = null;
                 }
             }
 
@@ -125,6 +127,22 @@ namespace ConstructionExchangeQuotes.Server.Repositories
                 return false;
             }
 
+            quoteToArchive.IsArchived = true;
+
+            var changes = _context.SaveChanges();
+
+            return changes > 0;
+        }
+
+        public bool UnarchiveQuote(int id)
+        {
+            var quoteToArchive = _context.Quotes.Find(id);
+
+            if (quoteToArchive == null || !quoteToArchive.IsArchived)
+            {
+                return false;
+            }
+
             quoteToArchive.IsArchived = false;
 
             var changes = _context.SaveChanges();
@@ -136,7 +154,7 @@ namespace ConstructionExchangeQuotes.Server.Repositories
         {
             var quoteToDelete = _context.Quotes.Find(id);
 
-            if(quoteToDelete == null)
+            if(quoteToDelete == null || !quoteToDelete.IsArchived)
             {
                 return false;
             }

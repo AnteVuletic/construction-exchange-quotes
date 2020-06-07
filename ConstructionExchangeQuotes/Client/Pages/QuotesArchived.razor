@@ -1,6 +1,6 @@
 ﻿@using System.Net.Http
 @using ConstructionExchangeQuotes.Shared
-@page "/quotes"
+@page "/quotes/archived"
 @inject HttpClient Http
 
 @code {
@@ -9,14 +9,12 @@
     private async Task FetchQuotes()
     {
         quotes = null;
-        quotes = await Http.GetFromJsonAsync<List<QuoteDto>>("quote/get");
+        quotes = await Http.GetFromJsonAsync<List<QuoteDto>>("quote/archived");
     }
 
     protected override async Task OnInitializedAsync() =>
         await FetchQuotes();
 }
-
-<a href="quotes/create" class="btn btn-primary">Create</a>
 
 @if (quotes == null)
 {
@@ -27,7 +25,7 @@ else
     <div class="quotes__list">
         @foreach (var quote in quotes)
         {
-            <QuoteTile Quote="quote" Refetch="@(async() => await FetchQuotes())" IsArchived="@false"/>
+            <QuoteTile Quote="quote" Refetch="@(async() => await FetchQuotes())" IsArchived="@true" />
         }
     </div>
 }

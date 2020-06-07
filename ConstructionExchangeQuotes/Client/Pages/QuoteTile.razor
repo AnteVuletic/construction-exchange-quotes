@@ -1,24 +1,66 @@
-﻿@using ConstructionExchangeQuotes.Shared
+﻿@using System.Net.Http
+@using ConstructionExchangeQuotes.Shared
+@inject HttpClient Http
 
 @code{
     [Parameter]
     public QuoteDto Quote { get; set; }
     [Parameter]
     public EventCallback Refetch { get; set; }
+    [Parameter]
+    public bool IsArchived { get; set; }
 
     private bool isArchiveModalOpen = false;
+    private bool isDeleteModalOpen = false;
     private double total;
+    private string modalTitle;
+    private string modalDescription;
+    private string archiveRoute;
 
-    protected override void OnInitialized() =>
+    public async Task HandleArchive()
+    {
+        var id = Quote.Id;
+        await Http.PutAsJsonAsync($"quote/{archiveRoute}/{id}", id);
+
+        if (Refetch.HasDelegate)
+        {
+            await Refetch.InvokeAsync(null);
+        }
+    }
+
+    private async Task HandleDelete()
+    {
+        var id = Quote.Id;
+        await Http.DeleteAsync($"quote/delete/{id}");
+
+        if (Refetch.HasDelegate)
+        {
+            await Refetch.InvokeAsync(null);
+        }
+    }
+
+    protected override void OnInitialized()
+    {
         total = Quote.SubTotal + (Quote.SubTotal * (Quote.TaxRatePercentage / 100));
+        modalTitle = IsArchived ? "Unarchive quote" : "Archive quote";
+        modalDescription = IsArchived ? "Are you sure you want to unarchive this quote?" : "Are you sure you want to archive this quote?";
+        archiveRoute = IsArchived ? "unarchive" : "archive";
+    }
 }
 
 @if (isArchiveModalOpen)
 {
-    <PromptModal Title="Archive quote"
-                 Description="Are you sure you want to archive this quote?"
+    <PromptModal Title="@modalTitle"
+                 Description="@modalDescription"
                  OnClose="@(() => isArchiveModalOpen = false)"
-                 OnConfirm="@(async() => await Refetch.InvokeAsync(null))" />
+                 OnConfirm="@(async() => await HandleArchive())" />
+}
+@if (isDeleteModalOpen)
+{
+    <PromptModal Title="Delete quote"
+                 Description="Are you sure you want to delete this quote?"
+                 OnClose="@(() => isDeleteModalOpen = false)"
+                 OnConfirm="@(async() => await HandleDelete())" />
 }
 
 <div class="card">
@@ -44,21 +86,27 @@
                 }
             </tbody>
         </table>
-        <button type="button" class="close" aria-label="Close" @onclick="@(() => isArchiveModalOpen = true)">
-            <span aria-hidden="true">&times;</span>
+        <button type="button" class="btn btn-outline-primary" aria-label="Close" @onclick="@(() => isArchiveModalOpen = true)">
+            <span aria-hidden="true" class="@(IsArchived ? "oi oi-account-logout" : "oi oi-account-login")"></span>
         </button>
+        @if (IsArchived)
+        {
+            <button type="button" class="btn btn-outline-danger" @onclick="@(() => isDeleteModalOpen = true)">
+                <span class="oi oi-trash"></span>
+            </button>
+        }
     </div>
     <div class="card-body">
         <table class="table table-bordered">
             <tbody>
                 <tr>
-                    <td>Subtotal - @Quote.SubTotal</td>
+                    <td>Subtotal - $@Quote.SubTotal</td>
                 </tr>
                 <tr>
                     <td>Tax rate - @Quote.TaxRatePercentage%</td>
                 </tr>
                 <tr>
-                    <td>Total - @total</td>
+                    <td>Total - $@total</td>
                 </tr>
                 <tr>
                     <td>Date created - @Quote.DateCreated</td>

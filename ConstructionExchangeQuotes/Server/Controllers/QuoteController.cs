@@ -67,7 +67,7 @@ namespace ConstructionExchangeQuotes.Server.Controllers
 
             if (!isDeleteSuccessful)
             {
-                return NotFound();
+                return BadRequest();
             }
 
             return Ok();
@@ -77,6 +77,19 @@ namespace ConstructionExchangeQuotes.Server.Controllers
         public IActionResult ArchiveQuote(int id)
         {
             var IsArchiveSuccessful = _quoteRepository.ArchiveQuote(id);
+
+            if (!IsArchiveSuccessful)
+            {
+                return BadRequest();
+            }
+
+            return Ok();
+        }
+
+        [HttpPut("unarchive/{id:int}")]
+        public IActionResult UnarchiveQuote(int id)
+        {
+            var IsArchiveSuccessful = _quoteRepository.UnarchiveQuote(id);
 
             if (!IsArchiveSuccessful)
             {
