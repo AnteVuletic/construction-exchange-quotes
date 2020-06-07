@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ConstructionExchangeQuotes.Server.Utils
+namespace ConstructionExchangeQuotes.Shared
 {
     public static class Date
     {

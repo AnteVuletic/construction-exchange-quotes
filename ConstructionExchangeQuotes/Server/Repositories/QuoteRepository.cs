@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Linq.Expressions;
 
 namespace ConstructionExchangeQuotes.Server.Repositories
 {
@@ -69,34 +70,32 @@ namespace ConstructionExchangeQuotes.Server.Repositories
             return addedQuote.Entity;
         }
 
-        public List<Quote> GetAllQuotes()
+        public List<Quote> GetQuotes(bool archived, string customerEmail, DateTime dateFrom, DateTime dateTo)
         {
-            var quotes = _context.Quotes
-                    .Include(q => q.QuoteElements)
-                    .ThenInclude(qe => qe.Element)
-                    .OrderByDescending(q => q.DateCreated)
-                    .Where(q => !q.IsArchived)
-                    .ToList();
+            Expression<Func<Quote, bool>> expression = quote => true;
+            expression = expression.AndAlso(q => q.IsArchived == archived);
+            DbFunctions dfunc = null;
 
-            foreach (var quote in quotes)
+            if (dateFrom != new DateTime())
             {
-                foreach (var quoteElement in quote.QuoteElements)
-                {
-                    quoteElement.Quote = null;
-                    quoteElement.Element.QuoteElements = null;
-                }
+                expression = expression.AndAlso(q => SqlServerDbFunctionsExtensions.DateDiffDay(dfunc, dateFrom, q.DateCreated) >= 0);
             }
 
-            return quotes;
-        }
+            if (dateTo != new DateTime())
+            {
+                expression = expression.AndAlso(q => SqlServerDbFunctionsExtensions.DateDiffDay(dfunc, q.DateCreated, dateTo) >= 0);
+            }
 
-        public List<Quote> GetArchivedQuotes()
-        {
+            if (!string.IsNullOrWhiteSpace(customerEmail))
+            {
+                expression = expression.AndAlso(q => q.CustomerEmail.Contains(customerEmail));
+            }
+
             var quotes = _context.Quotes
                     .Include(q => q.QuoteElements)
                     .ThenInclude(qe => qe.Element)
                     .OrderByDescending(q => q.DateCreated)
-                    .Where(q => q.IsArchived)
+                    .Where(expression)
                     .ToList();
 
             foreach (var quote in quotes)

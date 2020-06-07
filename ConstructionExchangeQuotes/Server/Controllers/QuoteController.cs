@@ -30,17 +30,9 @@ namespace ConstructionExchangeQuotes.Server.Controllers
         }
 
         [HttpGet("get")]
-        public IActionResult GetAllQuotes()
+        public IActionResult GetQuotes([FromQuery] bool archived, [FromQuery] string customerEmail, [FromQuery] DateTime dateFrom, [FromQuery] DateTime dateTo)
         {
-            var quotes = _quoteRepository.GetAllQuotes();
-
-            return Ok(quotes);
-        }
-
-        [HttpGet("archived")]
-        public IActionResult GetArchivedQuotes()
-        {
-            var quotes = _quoteRepository.GetArchivedQuotes();
+            var quotes = _quoteRepository.GetQuotes(archived, customerEmail, dateFrom, dateTo);
 
             return Ok(quotes);
         }

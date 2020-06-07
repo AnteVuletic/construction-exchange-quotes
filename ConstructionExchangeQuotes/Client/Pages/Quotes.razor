@@ -5,15 +5,29 @@
 
 @code {
     private List<QuoteDto> quotes;
+    private string customerEmail = string.Empty;
+    private DateTime dateFrom;
+    private DateTime dateTo;
 
     private async Task FetchQuotes()
     {
+        var emailParam = !string.IsNullOrWhiteSpace(customerEmail)
+            ? $"&customerEmail={customerEmail}" : string.Empty;
+        var dateFromParam = dateFrom != new DateTime()
+            ? $"&dateFrom={dateFrom}" : string.Empty;
+        var dateToParam = dateTo != new DateTime()
+            ? $"&dateTo={dateTo}" : string.Empty;
+
         quotes = null;
-        quotes = await Http.GetFromJsonAsync<List<QuoteDto>>("quote/get");
+        quotes = await Http.GetFromJsonAsync<List<QuoteDto>>($"quote/get?archived=false{emailParam}{dateFromParam}{dateToParam}");
     }
 
-    protected override async Task OnInitializedAsync() =>
+    protected override async Task OnInitializedAsync()
+    {
         await FetchQuotes();
+        dateFrom = DateTime.Now;
+        dateTo = DateTime.Now;
+    }
 }
 
 <a href="quotes/create" class="btn btn-primary">Create</a>
@@ -24,6 +38,23 @@
 }
 else
 {
+    <div class="d-flex justify-content-between w-50">
+        <div>
+            <label>Date from</label>
+            <input placeholder="Date from" type="date" @bind="dateFrom" />
+        </div>
+        <div>
+            <label>Date to</label>
+            <input placeholder="Date to" type="date" @bind="dateTo" />
+        </div>
+        <div>
+            <label>Email</label>
+            <input placeholder="Customer email" type="text" @bind="customerEmail" />
+        </div>
+        <button type="button" class="btn btn-outline-info" @onclick="FetchQuotes">
+            <span class="oi oi-magnifying-glass"></span>
+        </button>
+    </div>
     <div class="quotes__list">
         @foreach (var quote in quotes)
         {
