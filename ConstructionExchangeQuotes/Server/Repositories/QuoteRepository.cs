@@ -110,27 +110,6 @@ namespace ConstructionExchangeQuotes.Server.Repositories
             return quotes;
         }
 
-        public List<Quote> GetQuotesByDate(DateTime dateCreated)
-        {
-            var dateIso = Date.ToIsoFormat(dateCreated);
-
-            var quotes = _context.Quotes
-                    .Include(q => q.QuoteElements)
-                    .OrderByDescending(q => q.DateCreated)
-                    .Where(q => Date.ToIsoFormat(q.DateCreated) == dateIso && q.IsArchived == false)
-                    .ToList();
-
-            foreach (var quote in quotes)
-            {
-                foreach (var quoteElement in quote.QuoteElements)
-                {
-                    quoteElement.Quote = null;
-                }
-            }
-
-            return quotes;
-        }
-
         public bool ArchiveQuote(int id)
         {
             var quoteToArchive = _context.Quotes.Find(id);

@@ -37,21 +37,6 @@ namespace ConstructionExchangeQuotes.Server.Controllers
             return Ok(quotes);
         }
 
-        [HttpGet("get/date")]
-        public IActionResult GetQuotesByDate(string date)
-        {
-            var isDateValid = DateTime.TryParse(date, out var filterDate);
-
-            if (!isDateValid)
-            {
-                return BadRequest();
-            }
-
-            var quotes = _quoteRepository.GetQuotesByDate(filterDate);
-
-            return Ok(quotes);
-        }
-
         [HttpDelete("delete/{id:int}")]
         public IActionResult DeleteQuote(int id)
         {
