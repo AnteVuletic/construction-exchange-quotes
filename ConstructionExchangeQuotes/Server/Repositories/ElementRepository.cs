@@ -1,7 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Runtime.InteropServices;
 using ConstructionExchangeQuotes.Server.Models;
+using ConstructionExchangeQuotes.Server.Utils;
 using ConstructionExchangeQuotes.Shared;
+using Microsoft.EntityFrameworkCore;
 
 namespace ConstructionExchangeQuotes.Server.Repositories
 {
@@ -32,27 +37,40 @@ namespace ConstructionExchangeQuotes.Server.Repositories
             });
         }
 
-        public IEnumerable<ElementDto> GetElements()
+        public IEnumerable<ElementDto> GetElements(string name, int categoryId, int typeId)
         {
-            return _quotesDbContext.Elements.Select(x => new ElementDto
-            {
-                Id = x.Id,
-                Name = x.Name,
-                Rate = x.Rate,
-                ElementCategory = new ElementCategoryDto { 
-                    Id = x.ElementCategory.Id,
-                    Name = x.ElementCategory.Name
-                },
-                ElementType = new ElementTypeDto { 
-                    Id = x.ElementType.Id,
-                    Name = x.ElementType.Name
-                },
-                ElementFields = x.ElementFields.Select(ef => new ElementFieldDto { 
-                    Id = ef.Id,
-                    Name = ef.Name,
-                    Value = ef.Value
-                }).ToList()
-            });
+            Expression<Func<Element, bool>> baseExpression = x => true;
+
+            if (!string.IsNullOrWhiteSpace(name))
+                baseExpression = baseExpression.AndAlso((x) => x.Name.ToLower().Contains(name.ToLower()));
+
+            if (categoryId != 0)
+                baseExpression = baseExpression.AndAlso((x) => x.ElementCategory.Id == categoryId);
+
+            if (typeId != 0)
+                baseExpression = baseExpression.AndAlso((x) => x.ElementType.Id == typeId);
+
+            return _quotesDbContext.Elements
+                .Where(baseExpression)
+                .Select(x => new ElementDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Rate = x.Rate,
+                    ElementCategory = new ElementCategoryDto { 
+                        Id = x.ElementCategory.Id,
+                        Name = x.ElementCategory.Name
+                    },
+                    ElementType = new ElementTypeDto { 
+                        Id = x.ElementType.Id,
+                        Name = x.ElementType.Name
+                    },
+                    ElementFields = x.ElementFields.Select(ef => new ElementFieldDto { 
+                        Id = ef.Id,
+                        Name = ef.Name,
+                        Value = ef.Value
+                    }).ToList()
+                });
         }
 
         public bool AddElement(ElementDto elementDto)
@@ -85,7 +103,10 @@ namespace ConstructionExchangeQuotes.Server.Repositories
             if (!isElementValid)
                 return false;
 
-            var element = _quotesDbContext.Elements.Find(elementDto.Id.Value);
+            var element = _quotesDbContext.Elements
+                .AsQueryable()
+                .Include(x => x.ElementFields)
+                .Single(x => x.Id == elementDto.Id.Value);
             element.Name = elementDto.Name;
             element.Rate = elementDto.Rate;
             element.ElementCategoryId = elementDto.ElementCategory.Id.Value;

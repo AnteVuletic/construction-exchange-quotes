@@ -6,7 +6,10 @@
 <EditForm Model="@_elementDto" OnValidSubmit="SaveElement">
     <DataAnnotationsValidator />
     <ValidationSummary />
-    <h4>Add Element</h4>
+    @if (ElementInEdit == null)
+    {
+        <h4>Add Element</h4>
+    }
     <div class="form-group">
         <label for="name">Element name</label>
         <InputText id="name" @bind-Value="_elementDto.Name" class="form-control" />
@@ -42,11 +45,28 @@
         <button type="button" class="btn btn-primary w-100 d-block" @onclick="AddElementField">Add element field</button>
     </div>
     <div class="d-flex w-100 justify-content-center">
-        <button type="submit" class="btn btn-primary">Create</button>
+        @if (ElementInEdit != null)
+        {
+            <button type="submit" class="btn btn-primary">Edit</button>
+            <button type="button" class="btn btn-danger ml-5" @onclick="() => OnElementEditCancaled.InvokeAsync(null)">Cancel</button>
+        }
+        else
+        {
+            <button type="submit" class="btn btn-primary">Create</button>
+        }
     </div>
 </EditForm>
 
 @code {
+    [Parameter]
+    public ElementDto ElementInEdit { get; set; }
+
+    [Parameter]
+    public EventCallback OnElementEdited { get; set; }
+
+    [Parameter]
+    public EventCallback OnElementEditCancaled { get; set; }
+
     private ElementDto _elementDto = new ElementDto();
     private ICollection<ElementCategoryDto> _elementCategories = new List<ElementCategoryDto>();
     private ICollection<ElementTypeDto> _elementTypes = new List<ElementTypeDto>();
@@ -57,6 +77,12 @@
     {
         _elementCategories = await Http.GetFromJsonAsync<ICollection<ElementCategoryDto>>("element/get-categories");
         _elementTypes = await Http.GetFromJsonAsync<ICollection<ElementTypeDto>>("element/get-element-types");
+        if (ElementInEdit != null)
+        {
+            _elementDto = ElementInEdit;
+            _categoryId = ElementInEdit.ElementCategory.Id.ToString();
+            _elementTypeId = ElementInEdit.ElementType.Id.ToString();
+        }
     }
 
     void ElementFieldDeleted(ElementFieldDto elementField)
@@ -73,9 +99,19 @@
     {
         _elementDto.ElementCategory = _elementCategories.Single(x => x.Id == int.Parse(_categoryId));
         _elementDto.ElementType = _elementTypes.Single(x => x.Id == int.Parse(_elementTypeId));
-        await Http.PostAsJsonAsync("element/add-element", _elementDto);
+        if (ElementInEdit == null)
+        {
+            await Http.PostAsJsonAsync("element/add-element", _elementDto);
+        }
+        else
+        {
+            await Http.PostAsJsonAsync("element/edit-element", _elementDto);
+        }
         _categoryId = string.Empty;
         _elementTypeId = string.Empty;
         _elementDto = new ElementDto();
+
+        if (OnElementEditCancaled.HasDelegate)
+            await OnElementEditCancaled.InvokeAsync(null);
     }
 }

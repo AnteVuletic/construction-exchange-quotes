@@ -24,5 +24,10 @@ namespace ConstructionExchangeQuotes.Shared
         public ElementCategoryDto ElementCategory { get; set; }
 
         public ICollection<ElementFieldDto> ElementFields { get; set; }
+
+        public ElementDto CloneObject()
+        {
+            return (ElementDto) this.MemberwiseClone();
+        }
     }
 }

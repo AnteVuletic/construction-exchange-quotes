@@ -28,9 +28,9 @@ namespace ConstructionExchangeQuotes.Server.Controllers
         }
 
         [HttpGet("get")]
-        public IActionResult GetElements()
+        public IActionResult GetElements([FromQuery] string name, [FromQuery] int categoryId, [FromQuery] int typeId)
         {
-            return Ok(_elementRepository.GetElements());
+            return Ok(_elementRepository.GetElements(name, categoryId, typeId));
         }
 
         [HttpPost("add-element")]

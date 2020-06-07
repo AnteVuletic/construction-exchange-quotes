@@ -1,26 +1,92 @@
 ﻿@page "/elements"
 
 @using ConstructionExchangeQuotes.Shared
+@inject NavigationManager NavigationManager
 @inject HttpClient Http
 
 <h1>Element</h1>
 
-<div class="d-flex justify-content-end w-100">
+<div class="d-flex justify-content-between w-100 mb-5">
+    <div class="row d-flex justify-content-between w-50">
+        <input placeholder="Name" class="form-control col-3" value="@_nameSearch" @oninput="NameChangedAsync"/>
+        <select placeholder="Element type" class="form-control col-4" value="@_elementTypeId" @onchange="ElementTypeChangedAsync">
+            <option value="0">Element type</option>
+            @foreach (var elementType in _elementTypes)
+            {
+                <option value="@elementType.Id">
+                    @elementType.Name
+                </option>
+            }
+        </select>
+        <select placeholder="Category" class="form-control col-4" value="@_elementCategoryId" @onchange="CategoryChangedAsync">
+            <option value="0">Category</option>
+            @foreach (var category in _elementCategories)
+            {
+                <option value="@category.Id">
+                    @category.Name
+                </option>
+            }
+        </select>
+    </div>
     <a href="element/create" class="btn btn-primary">Create</a>
 </div>
 
 <div class="card-columns">
     @foreach (var element in _elements)
     {
-        <RenderElement Element="element" />
+        <RenderElement Element="element" RefreshElements="InitializeElements" />
     }
 </div>
 
 @code {
     private IList<ElementDto> _elements = new List<ElementDto>();
+    private IList<ElementCategoryDto> _elementCategories = new List<ElementCategoryDto>();
+    private IList<ElementTypeDto> _elementTypes = new List<ElementTypeDto>();
+    private int _elementCategoryId = 0;
+    private int _elementTypeId = 0;
+    private string _nameSearch = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        _elements = await Http.GetFromJsonAsync<IList<ElementDto>>("element/get");
+        await InitializeElements();
+        _elementCategories = await Http.GetFromJsonAsync<IList<ElementCategoryDto>>("element/get-categories");
+        _elementTypes = await Http.GetFromJsonAsync<IList<ElementTypeDto>>("element/get-element-types");
+    }
+
+    private async Task NameChangedAsync(ChangeEventArgs args)
+    {
+        _nameSearch = args.Value.ToString();
+        await InitializeElements();
+    }
+
+    private async Task CategoryChangedAsync(ChangeEventArgs args)
+    {
+        _elementCategoryId = int.Parse(args.Value.ToString());
+        await InitializeElements();
+    }
+
+    private async Task ElementTypeChangedAsync(ChangeEventArgs args)
+    {
+        _elementTypeId = int.Parse(args.Value.ToString());
+        await InitializeElements();
+    }
+
+    async Task InitializeElements()
+    {
+        var uriBuilder = new UriBuilder($"{NavigationManager.BaseUri}element/get");
+        var query = System.Web.HttpUtility.ParseQueryString(uriBuilder.Query);
+
+        if (_elementCategoryId != 0)
+            query["categoryId"] = _elementCategoryId.ToString();
+
+        if (_elementTypeId != 0)
+            query["typeId"] = _elementTypeId.ToString();
+
+        if (!string.IsNullOrWhiteSpace(_nameSearch))
+            query["name"] = _nameSearch;
+
+        uriBuilder.Query = query.ToString();
+
+        _elements = await Http.GetFromJsonAsync<IList<ElementDto>>(uriBuilder.ToString());
     }
 }
