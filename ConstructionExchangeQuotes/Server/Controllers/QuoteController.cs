@@ -1,6 +1,9 @@
 ﻿using ConstructionExchangeQuotes.Server.Models;
 using ConstructionExchangeQuotes.Server.Repositories;
+using ConstructionExchangeQuotes.Shared;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 
@@ -18,9 +21,14 @@ namespace ConstructionExchangeQuotes.Server.Controllers
         }
 
         [HttpPost("add")]
-        public IActionResult AddQuote(double taxRatePercentage, string customerEmail, List<QuoteElement> quoteElements)
+        public IActionResult AddQuote(AddQuoteData data)
         {
-            var addedQuote = _quoteRepository.AddQuote(taxRatePercentage, customerEmail, quoteElements);
+            var addedQuote = _quoteRepository.AddQuote(data.TaxRatePercentage, data.CustomerEmail, data.QuoteElements);
+
+            if(addedQuote == null)
+            {
+                return BadRequest();
+            }
 
             return Ok(addedQuote);
         }

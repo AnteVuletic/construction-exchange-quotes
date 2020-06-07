@@ -10,6 +10,8 @@
     [Parameter]
     public EventCallback<QuoteElementDto> OnElementFieldDeleted { get; set; }
     [Parameter]
+    public EventCallback OnChange { get; set; }
+    [Parameter]
     public bool IsFirst { get; set; }
 
     private ElementDto selectedElement;
@@ -18,11 +20,9 @@
     private async Task FetchElements()
     {
         availableElements = new List<ElementDto>();
-        //var allElements = await Http.GetFromJsonAsync<ICollection<ElementDto>>("element/get");
+        var allElements = await Http.GetFromJsonAsync<IList<ElementDto>>("element/get");
 
-        //availableElements = allElements.Where(e => !ForbiddenElements.Contains(e)).ToList();
-
-        availableElements = await Http.GetFromJsonAsync<List<ElementDto>>("element/get");
+        availableElements = allElements.Where(e => !ForbiddenElements.Any(fe => fe.Id == e.Id)).ToList();
     }
 
     protected override async Task OnInitializedAsync() =>
@@ -42,9 +42,32 @@
         {
             QuoteElement.ElementId = 0;
             QuoteElement.Element = null;
+            QuoteElement.Amount = 0;
         }
-        QuoteElement.ElementId =int.Parse(args.Value.ToString());
+        QuoteElement.ElementId = int.Parse(args.Value.ToString());
         QuoteElement.Element = availableElements.FirstOrDefault(qe => qe.Id == QuoteElement.ElementId);
+        QuoteElement.Amount = 1;
+
+        if (OnChange.HasDelegate)
+        {
+            OnChange.InvokeAsync(null);
+        }
+    }
+
+    public void HandleAmountChange(ChangeEventArgs args)
+    {
+        var isParseSuccessful = int.TryParse(args.Value.ToString(), out int value);
+
+        if (isParseSuccessful &&
+            value >= 0)
+        {
+            QuoteElement.Amount = value;
+        }
+
+        if (OnChange.HasDelegate)
+        {
+            OnChange.InvokeAsync(null);
+        }
     }
 }
 
@@ -68,7 +91,7 @@
                 <option value="@element.Id">@element.Name [@element.ElementType.Name - @element.ElementCategory.Name]</option>
             }
         </select>
-        <input type="number" for="amount" @bind="QuoteElement.Amount" class="col-2" />
+        <input type="number" for="amount" value="@QuoteElement.Amount" class="col-2" @onchange="HandleAmountChange"/>
         <p for="rate" class="col-1">$@QuoteElement.Element.Rate</p>
         <p for="sum" class="col-2">$@(QuoteElement.Element.Rate * QuoteElement.Amount)</p>
         <button type="button" class="close col-1" aria-label="Close" @onclick="DeleteItem">

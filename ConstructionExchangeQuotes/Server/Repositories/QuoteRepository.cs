@@ -1,5 +1,6 @@
 ﻿using ConstructionExchangeQuotes.Server.Models;
 using ConstructionExchangeQuotes.Server.Utils;
+using ConstructionExchangeQuotes.Shared;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -16,8 +17,13 @@ namespace ConstructionExchangeQuotes.Server.Repositories
             _context = context;
         }
 
-        public Quote AddQuote(double taxRatePercentage, string customerEmail, List<QuoteElement> quoteElements)
+        public Quote AddQuote(double taxRatePercentage, string customerEmail, List<QuoteElementDto> quoteElements)
         {
+            if(quoteElements.Count == 0)
+            {
+                return null;
+            }
+
             var subTotal = quoteElements.Sum(qe => qe.Element.Rate * qe.Amount);
             var dateCreated = DateTime.Now;
 
@@ -39,7 +45,11 @@ namespace ConstructionExchangeQuotes.Server.Repositories
                 quoteElement.QuoteId = addedQuote.Entity.Id;
             }
 
-            _context.QuoteElements.AddRange(quoteElements);
+            _context.QuoteElements.AddRange(quoteElements.Select(qe => new QuoteElement() { 
+                Amount = qe.Amount,
+                ElementId = qe.ElementId,
+                QuoteId = qe.QuoteId
+            }));
             _context.SaveChanges();
 
             return addedQuote.Entity;
