@@ -1,6 +1,9 @@
 ﻿@page "/element-type"
 @using ConstructionExchangeQuotes.Shared
+@using System.Net
+@using System.Web
 @inject HttpClient Http
+@inject NavigationManager NavigationManager 
 
 @if (_elementTypeInEdit != null)
 {
@@ -20,6 +23,11 @@
     </Modal>
 }
 
+@if (isDeleteElementTypeFailedModalOpen)
+{
+    <PromptModal Title="Failed to delete" Description="Failed to delete element type since is used on elements, please delete elements to delete this element type" OnClose="CloseModal" OnConfirm="CloseModal"></PromptModal>
+}
+
 <EditForm Model="@_elementTypeDto" OnValidSubmit="CreateElementType" class="mb-5">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -32,6 +40,10 @@
         <button type="submit" class="btn btn-primary">Create</button>
     </div>
 </EditForm>
+
+<div class="mb-5">
+    <input type="text" class="form-control w-100" value="@_nameFilter" @oninput="OnChangeNameFilter" placeholder="Search by name" />
+</div>
 
 <table class="table">
     <thead>
@@ -60,6 +72,8 @@
     private ElementTypeDto _elementTypeDto = new ElementTypeDto();
     private IList<ElementTypeDto> _elementTypes = new List<ElementTypeDto>();
     private ElementTypeDto _elementTypeInEdit;
+    private bool isDeleteElementTypeFailedModalOpen = false;
+    private string _nameFilter = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -68,7 +82,14 @@
 
     public async Task InitializeElementTypes()
     {
-        _elementTypes = await Http.GetFromJsonAsync<IList<ElementTypeDto>>("element/get-element-types");
+        var uriBuilder = new UriBuilder($"{NavigationManager.BaseUri}element/get-element-types");
+        var query = HttpUtility.ParseQueryString(uriBuilder.Query);
+
+        if (!string.IsNullOrWhiteSpace(_nameFilter))
+            query["name"] = _nameFilter;
+
+        uriBuilder.Query = query.ToString();
+        _elementTypes = await Http.GetFromJsonAsync<IList<ElementTypeDto>>(uriBuilder.ToString());
     }
 
     public async Task CreateElementType()
@@ -93,7 +114,23 @@
 
     public async Task DeleteElementType(int? elementId)
     {
-        await Http.DeleteAsync($"element/delete-type/{elementId.Value}");
+        var response = await Http.DeleteAsync($"element/delete-type/{elementId.Value}");
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            isDeleteElementTypeFailedModalOpen = true;
+            return;
+        }
+        await InitializeElementTypes();
+    }
+
+    void CloseModal()
+    {
+        isDeleteElementTypeFailedModalOpen = false;
+    }
+
+    async Task OnChangeNameFilter(ChangeEventArgs args)
+    {
+        _nameFilter = args.Value.ToString();
         await InitializeElementTypes();
     }
 }

@@ -1,5 +1,8 @@
 ﻿@page "/category"
 @using ConstructionExchangeQuotes.Shared
+@using System.Web
+@using System.Net
+@inject NavigationManager NavigationManager
 @inject HttpClient Http
 
 @if (_elementCategoryInEdit != null)
@@ -20,6 +23,11 @@
     </Modal>
 }
 
+@if (isFailedDeleteModalOpen)
+{
+    <PromptModal Title="Failed to delete" Description="Failed to delete element category since is used on elements, please delete elements to delete this element category" OnClose="CloseModal" OnConfirm="CloseModal"></PromptModal>
+}
+
 <EditForm Model="@_elementCategory" OnValidSubmit="CreateCategory" class="mb-5">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -33,6 +41,10 @@
     </div>
 </EditForm>
 
+<div class="mb-5">
+    <input type="text" class="form-control w-100" value="@_nameFilter" @oninput="OnChangeNameFilter" placeholder="Search by name" />
+</div>
+
 <table class="table">
     <thead>
         <tr>
@@ -42,14 +54,14 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var elementType in _elementCategories)
+        @foreach (var elementCategory in _elementCategories)
         {
             <tr>
-                <th scope="row">@elementType.Id</th>
-                <td>@elementType.Name</td>
+                <th scope="row">@elementCategory.Id</th>
+                <td>@elementCategory.Name</td>
                 <td>
-                    <button class="btn btn-danger" @onclick="async () => await DeleteCategory(elementType.Id)">Delete</button>
-                    <button class="btn btn-secondary" @onclick="() => _elementCategoryInEdit = elementType.CloneObject()">Edit</button>
+                    <button class="btn btn-danger" @onclick="async () => await DeleteCategory(elementCategory.Id)">Delete</button>
+                    <button class="btn btn-secondary" @onclick="() => _elementCategoryInEdit = elementCategory.CloneObject()">Edit</button>
                 </td>
             </tr>
         }
@@ -60,6 +72,8 @@
     private ElementCategoryDto _elementCategory = new ElementCategoryDto();
     private IList<ElementCategoryDto> _elementCategories = new List<ElementCategoryDto>();
     private ElementCategoryDto _elementCategoryInEdit;
+    private string _nameFilter = string.Empty;
+    private bool isFailedDeleteModalOpen = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -68,7 +82,14 @@
 
     public async Task InitializeCategories()
     {
-        _elementCategories = await Http.GetFromJsonAsync<IList<ElementCategoryDto>>("element/get-categories");
+        var uriBuilder = new UriBuilder($"{NavigationManager.BaseUri}element/get-categories");
+        var query = HttpUtility.ParseQueryString(uriBuilder.Query);
+
+        if (!string.IsNullOrWhiteSpace(_nameFilter))
+            query["name"] = _nameFilter;
+
+        uriBuilder.Query = query.ToString();
+        _elementCategories = await Http.GetFromJsonAsync<IList<ElementCategoryDto>>(uriBuilder.ToString());
     }
 
     public async Task CreateCategory()
@@ -81,7 +102,12 @@
 
     public async Task DeleteCategory(int? id)
     {
-        await Http.DeleteAsync($"element/delete-category/{id.Value}");
+        var response = await Http.DeleteAsync($"element/delete-category/{id.Value}");
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            isFailedDeleteModalOpen = true;
+            return;
+        }
         await InitializeCategories();
     }
 
@@ -95,5 +121,16 @@
     void CancelElementCategoryEdit()
     {
         _elementCategoryInEdit = null;
+    }
+
+    async Task OnChangeNameFilter(ChangeEventArgs args)
+    {
+        _nameFilter = args.Value.ToString();
+        await InitializeCategories();
+    }
+
+    void CloseModal()
+    {
+        isFailedDeleteModalOpen = false;
     }
 }

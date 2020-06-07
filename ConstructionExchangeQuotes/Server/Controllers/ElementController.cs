@@ -16,15 +16,15 @@ namespace ConstructionExchangeQuotes.Server.Controllers
         }
 
         [HttpGet("get-categories")]
-        public IActionResult GetCategories()
+        public IActionResult GetCategories([FromQuery] string name)
         {
-            return Ok(_elementRepository.GetElementCategories());
+            return Ok(_elementRepository.GetElementCategories(name));
         }
 
         [HttpGet("get-element-types")]
-        public IActionResult GetElementTypes()
+        public IActionResult GetElementTypes([FromQuery] string name)
         {
-            return Ok(_elementRepository.GetElementTypes());
+            return Ok(_elementRepository.GetElementTypes(name));
         }
 
         [HttpGet("get")]
@@ -59,7 +59,9 @@ namespace ConstructionExchangeQuotes.Server.Controllers
         [HttpDelete("delete-element/{elementId:int}")]
         public IActionResult DeleteElement(int elementId)
         {
-            _elementRepository.DeleteElement(elementId);
+            var isSuccessful = _elementRepository.DeleteElement(elementId);
+            if (!isSuccessful)
+                return BadRequest();
             return Ok();
         }
 

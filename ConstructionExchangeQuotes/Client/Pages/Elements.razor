@@ -1,6 +1,7 @@
 ﻿@page "/elements"
 
 @using ConstructionExchangeQuotes.Shared
+@using System.Web
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 
@@ -74,7 +75,7 @@
     async Task InitializeElements()
     {
         var uriBuilder = new UriBuilder($"{NavigationManager.BaseUri}element/get");
-        var query = System.Web.HttpUtility.ParseQueryString(uriBuilder.Query);
+        var query = HttpUtility.ParseQueryString(uriBuilder.Query);
 
         if (_elementCategoryId != 0)
             query["categoryId"] = _elementCategoryId.ToString();

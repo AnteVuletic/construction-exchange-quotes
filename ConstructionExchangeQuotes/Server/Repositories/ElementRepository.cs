@@ -19,22 +19,36 @@ namespace ConstructionExchangeQuotes.Server.Repositories
             _quotesDbContext = quotesDbContext;
         }
 
-        public IEnumerable<ElementCategoryDto> GetElementCategories()
+        public IEnumerable<ElementCategoryDto> GetElementCategories(string name)
         {
-            return _quotesDbContext.ElementCategories.Select(x => new ElementCategoryDto
-            {
-                Id = x.Id,
-                Name = x.Name
-            });
+            Expression<Func<ElementCategory, bool>> baseExpression = x => true;
+
+            if (!string.IsNullOrWhiteSpace(name))
+                baseExpression = baseExpression.AndAlso(x => x.Name.ToLower().Contains(name.ToLower()));
+
+            return _quotesDbContext.ElementCategories
+                .Where(baseExpression)
+                .Select(x => new ElementCategoryDto
+                {
+                    Id = x.Id,
+                    Name = x.Name
+                });
         }
 
-        public IEnumerable<ElementTypeDto> GetElementTypes()
+        public IEnumerable<ElementTypeDto> GetElementTypes(string name)
         {
-            return _quotesDbContext.ElementTypes.Select(x => new ElementTypeDto
-            {
-                Id = x.Id,
-                Name = x.Name
-            });
+            Expression<Func<ElementType, bool>> baseExpression = x => true;
+
+            if (!string.IsNullOrWhiteSpace(name))
+                baseExpression = baseExpression.AndAlso(x => x.Name.ToLower().Contains(name.ToLower()));
+
+            return _quotesDbContext.ElementTypes
+                .Where(baseExpression)
+                .Select(x => new ElementTypeDto
+                {
+                    Id = x.Id,
+                    Name = x.Name
+                });
         }
 
         public IEnumerable<ElementDto> GetElements(string name, int categoryId, int typeId)
@@ -137,11 +151,17 @@ namespace ConstructionExchangeQuotes.Server.Repositories
             return true;
         }
 
-        public void DeleteElement(int elementId)
+        public bool DeleteElement(int elementId)
         {
+            var isUsedOnQuotes = _quotesDbContext.Elements.Any(x => x.QuoteElements.Any());
+            if (isUsedOnQuotes) 
+            {
+                return false;
+            }
             var element = _quotesDbContext.Elements.Find(elementId);
             _quotesDbContext.Elements.Remove(element);
             _quotesDbContext.SaveChanges();
+            return true;
         }
 
         private bool IsElementValid(ElementDto elementDto)

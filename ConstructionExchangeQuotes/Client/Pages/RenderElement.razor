@@ -1,17 +1,24 @@
 ﻿@using ConstructionExchangeQuotes.Shared
-@inject HttpClient Http 
+@using System.Net
+@inject HttpClient Http
 
-@if (_elementInEdit != null) {
+@if (_elementInEdit != null)
+{
     <Modal Title="Edit element" OnClose="CancelEdit" ShouldRenderButtons="false">
         <ElementCreateEdit ElementInEdit="_elementInEdit" OnElementEditCancaled="CancelEdit" OnElementEdited="InvokeRefresh" />
     </Modal>
+}
+
+@if (isPromptModalVisible)
+{
+    <PromptModal Title="Unable to delete element" Description="Please delete all quotes this element is used on before deleting element" OnClose="CloseModal" OnConfirm="CloseModal"/>
 }
 
 <div class="card">
     <h5 class="card-header d-flex justify-content-between w-100">
         <span>@Element.Name</span>
         <span>
-            <button type="button" class="btn btn-outline-primary" @onclick="() => _elementInEdit = Element.CloneObject()" ><span class="oi oi-pencil"></span></button>
+            <button type="button" class="btn btn-outline-primary" @onclick="() => _elementInEdit = Element.CloneObject()"><span class="oi oi-pencil"></span></button>
             <button type="button" class="btn btn-outline-danger" @onclick="DeleteElement"><span class="oi oi-trash"></span></button>
         </span>
     </h5>
@@ -58,10 +65,22 @@
 
     private ElementDto _elementInEdit;
 
+    private bool isPromptModalVisible = false;
+
     async Task DeleteElement()
     {
-        await Http.DeleteAsync($"element/delete-element/{Element.Id}");
+        var response = await Http.DeleteAsync($"element/delete-element/{Element.Id}");
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            _elementInEdit = null;
+            isPromptModalVisible = true;
+        }
         await InvokeRefresh();
+    }
+
+    void CloseModal()
+    {
+        isPromptModalVisible = false;
     }
 
     async Task InvokeRefresh()
