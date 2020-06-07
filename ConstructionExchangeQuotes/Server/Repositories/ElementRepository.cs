@@ -138,7 +138,7 @@ namespace ConstructionExchangeQuotes.Server.Repositories
                 elementField.Value = fieldEdited.Value;
             }
 
-            var fieldsAdded = elementDto.ElementFields.Where(x => x.Id == 0).Select(x => new ElementField
+            var fieldsAdded = elementDto.ElementFields.Where(x => !x.Id.HasValue).Select(x => new ElementField
             {
                 Name = x.Name,
                 Value = x.Value,

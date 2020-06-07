@@ -1,23 +1,28 @@
-﻿using ConstructionExchangeQuotes.Server.Models;
+﻿using ConstructionExchangeQuotes.Server.InfrastructureModels;
+using ConstructionExchangeQuotes.Server.Models;
 using ConstructionExchangeQuotes.Server.Utils;
 using ConstructionExchangeQuotes.Shared;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace ConstructionExchangeQuotes.Server.Repositories
 {
     public class QuoteRepository
     {
         private readonly QuotesDbContext _context;
+        private readonly EmailSender _emailSender;
 
-        public QuoteRepository(QuotesDbContext context)
+        public QuoteRepository(QuotesDbContext context, EmailSender emailSender)
         {
             _context = context;
+            _emailSender = emailSender;
         }
 
-        public Quote AddQuote(double taxRatePercentage, string customerEmail, List<QuoteElementDto> quoteElements)
+        public Quote AddQuote(double taxRatePercentage, string customerEmail, List<QuoteElementDto> quoteElements, bool shouldNotifyByMail)
         {
             if(quoteElements.Count == 0)
             {
@@ -51,6 +56,15 @@ namespace ConstructionExchangeQuotes.Server.Repositories
                 QuoteId = qe.QuoteId
             }));
             _context.SaveChanges();
+
+            if (shouldNotifyByMail)
+            {
+
+                var elementAggregateString = quoteElements.Aggregate("<br>Name - Amount - Rate - Total<br>", (acc, qE) => acc + $" <br>{qE.Element.Name} - {qE.Amount} - {qE.Element.Rate}$ - {qE.Amount * qE.Element.Rate}$");
+                var body = $"Subtotal: {quoteToAdd.SubTotal}$ | TaxRatePercentage: {quoteToAdd.TaxRatePercentage}% | Date Created: {quoteToAdd.DateCreated.ToLongDateString()}{elementAggregateString}";
+                var message = new Message(new List<string>() { customerEmail }, $"Quote for construction work | {quoteToAdd.SubTotal}$", body);
+                _emailSender.SendMail(message);
+            }
 
             return addedQuote.Entity;
         }

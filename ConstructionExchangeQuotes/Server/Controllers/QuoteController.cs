@@ -19,7 +19,7 @@ namespace ConstructionExchangeQuotes.Server.Controllers
         [HttpPost("add")]
         public IActionResult AddQuote(AddQuoteData data)
         {
-            var addedQuote = _quoteRepository.AddQuote(data.TaxRatePercentage, data.CustomerEmail, data.QuoteElements);
+            var addedQuote = _quoteRepository.AddQuote(data.TaxRatePercentage, data.CustomerEmail, data.QuoteElements, data.ShouldNotifyByEmail);
 
             if(addedQuote == null)
             {

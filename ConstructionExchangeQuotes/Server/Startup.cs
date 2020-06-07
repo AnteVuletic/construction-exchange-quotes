@@ -9,6 +9,8 @@ using System.Linq;
 using ConstructionExchangeQuotes.Server.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using ConstructionExchangeQuotes.Server.Configuration;
+using ConstructionExchangeQuotes.Server.Utils;
 
 namespace ConstructionExchangeQuotes.Server
 {
@@ -26,10 +28,13 @@ namespace ConstructionExchangeQuotes.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            var emailConfig = Configuration.GetSection("Email").Get<EmailConfig>();
+            services.AddSingleton(emailConfig);
             services.AddDbContext<QuotesDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("QuotesDbContext")));
 
             services.AddScoped<ElementRepository>();
             services.AddScoped<QuoteRepository>();
+            services.AddScoped<EmailSender>();
             services.AddCors(options =>
             {
                 options.AddPolicy(AllowCors, builder =>
