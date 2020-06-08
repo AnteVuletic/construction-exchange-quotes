@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ConstructionExchangeQuotes.Client.Services;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Radzen;
 
 namespace ConstructionExchangeQuotes.Client
 {
@@ -16,6 +17,8 @@ namespace ConstructionExchangeQuotes.Client
 
             builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             builder.Services.AddSingleton<PermissionCacheService>();
+            builder.Services.AddScoped<DialogService>();
+            builder.Services.AddScoped<NotificationService>();
 
             await builder.Build().RunAsync();
         }

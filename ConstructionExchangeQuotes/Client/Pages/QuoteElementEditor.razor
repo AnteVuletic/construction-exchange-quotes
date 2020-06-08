@@ -1,5 +1,6 @@
 ﻿@using ConstructionExchangeQuotes.Shared
 @using System.Net.Http
+@using Radzen.Blazor 
 @inject HttpClient Http
 
 @code {
@@ -36,21 +37,24 @@
         }
     }
 
-    public void HandleUpdateElement(ChangeEventArgs args)
+    public void HandleUpdateElement(object objectId)
     {
-        if(args.Value.ToString() == "none")
+        if (objectId is int id)
         {
-            QuoteElement.ElementId = 0;
-            QuoteElement.Element = null;
-            QuoteElement.Amount = 0;
-        }
-        QuoteElement.ElementId = int.Parse(args.Value.ToString());
-        QuoteElement.Element = availableElements.FirstOrDefault(qe => qe.Id == QuoteElement.ElementId);
-        QuoteElement.Amount = 1;
+            //if(args.Value.ToString() == "none")
+            //{
+            //    QuoteElement.ElementId = 0;
+            //    QuoteElement.Element = null;
+            //    QuoteElement.Amount = 0;
+            //}
+            QuoteElement.ElementId = id;
+            QuoteElement.Element = availableElements.FirstOrDefault(qe => qe.Id == QuoteElement.ElementId);
+            QuoteElement.Amount = 1;
 
-        if (OnChange.HasDelegate)
-        {
-            OnChange.InvokeAsync(null);
+            if (OnChange.HasDelegate)
+            {
+                OnChange.InvokeAsync(null);
+            }
         }
     }
 
@@ -84,13 +88,7 @@
         </div>
         }
     <div class="row">
-        <select id="type" class="form-control col-6" @onchange="HandleUpdateElement">
-            <option value="none">None</option>
-            @foreach (var element in availableElements)
-            {
-                <option value="@element.Id">@element.Name [@element.ElementType.Name - @element.ElementCategory.Name]</option>
-            }
-        </select>
+        <RadzenDropDown AllowClear="false" TValue="int" Data="@availableElements" FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive" FilterOperator="Radzen.StringFilterOperator.StartsWith" AllowFiltering="true" ValueProperty="Id" Change="@(args => HandleUpdateElement(args))"/>
         <input type="number" for="amount" value="@QuoteElement.Amount" class="col-2" @onchange="HandleAmountChange"/>
         <p for="rate" class="col-1">$@QuoteElement.Element.Rate</p>
         <p for="sum" class="col-2">$@(QuoteElement.Element.Rate * QuoteElement.Amount)</p>

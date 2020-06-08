@@ -7,7 +7,7 @@ namespace ConstructionExchangeQuotes.Server.Utils
     {
         public async Task<bool> CheckAuthorizationClient(StringValues stringValues)
         {
-            return await Task.FromResult(false);
+            return await Task.FromResult(true);
         }
     }
 }

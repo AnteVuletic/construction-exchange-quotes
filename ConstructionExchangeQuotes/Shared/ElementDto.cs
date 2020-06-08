@@ -29,5 +29,15 @@ namespace ConstructionExchangeQuotes.Shared
         {
             return (ElementDto) this.MemberwiseClone();
         }
+
+        public override string ToString()
+        {
+            return $"{this.Name} [{this.ElementType.Name} - {this.ElementCategory.Name}]";
+        }
+
+        public string ToLower()
+        {
+            return ToString().ToLower();
+        }
     }
 }
