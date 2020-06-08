@@ -35,6 +35,8 @@ namespace ConstructionExchangeQuotes.Server
             services.AddScoped<ElementRepository>();
             services.AddScoped<QuoteRepository>();
             services.AddScoped<EmailSender>();
+            services.AddSingleton<SimulateAuthorizationRestClient>();
+
             services.AddCors(options =>
             {
                 options.AddPolicy(AllowCors, builder =>

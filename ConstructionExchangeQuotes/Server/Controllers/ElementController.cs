@@ -1,4 +1,5 @@
 ﻿using ConstructionExchangeQuotes.Server.Repositories;
+using ConstructionExchangeQuotes.Server.Utils;
 using ConstructionExchangeQuotes.Shared;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,6 +34,7 @@ namespace ConstructionExchangeQuotes.Server.Controllers
             return Ok(_elementRepository.GetElements(name, categoryId, typeId));
         }
 
+        [CrudPermission]
         [HttpPost("add-element")]
         public IActionResult AddElement(ElementDto elementDto)
         {
@@ -42,6 +44,7 @@ namespace ConstructionExchangeQuotes.Server.Controllers
             return Ok();
         }
 
+        [CrudPermission]
         [HttpPost("add-category")]
         public IActionResult AddCategory(ElementCategoryDto elementCategoryDto)
         {
@@ -49,6 +52,7 @@ namespace ConstructionExchangeQuotes.Server.Controllers
             return Ok();
         }
 
+        [CrudPermission]
         [HttpPost("add-type")]
         public IActionResult AddType(ElementTypeDto elementTypeDto)
         {
@@ -56,6 +60,7 @@ namespace ConstructionExchangeQuotes.Server.Controllers
             return Ok();
         }
 
+        [CrudPermission]
         [HttpDelete("delete-element/{elementId:int}")]
         public IActionResult DeleteElement(int elementId)
         {
@@ -65,6 +70,7 @@ namespace ConstructionExchangeQuotes.Server.Controllers
             return Ok();
         }
 
+        [CrudPermission]
         [HttpDelete("delete-category/{categoryId:int}")]
         public IActionResult DeleteCategory(int categoryId)
         {
@@ -74,6 +80,7 @@ namespace ConstructionExchangeQuotes.Server.Controllers
             return Ok();
         }
 
+        [CrudPermission]
         [HttpDelete("delete-type/{typeId:int}")]
         public IActionResult DeleteElementType(int typeId)
         {
@@ -83,6 +90,7 @@ namespace ConstructionExchangeQuotes.Server.Controllers
             return Ok();
         }
 
+        [CrudPermission]
         [HttpPost("edit-element")]
         public IActionResult EditElement(ElementDto elementDto)
         {
@@ -92,6 +100,7 @@ namespace ConstructionExchangeQuotes.Server.Controllers
             return Ok();
         }
 
+        [CrudPermission]
         [HttpPost("edit-category")]
         public IActionResult UpdateCategory(ElementCategoryDto elementCategoryDto)
         {
@@ -99,6 +108,7 @@ namespace ConstructionExchangeQuotes.Server.Controllers
             return Ok();
         }
 
+        [CrudPermission]
         [HttpPost("edit-type")]
         public IActionResult UpdateType(ElementTypeDto elementTypeDto)
         {
