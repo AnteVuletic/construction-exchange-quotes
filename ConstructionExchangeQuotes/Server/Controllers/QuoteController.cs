@@ -17,7 +17,6 @@ namespace ConstructionExchangeQuotes.Server.Controllers
             _quoteRepository = quoteRepository;
         }
 
-        [CrudPermission]
         [HttpPost("add")]
         public IActionResult AddQuote(AddQuoteData data)
         {
@@ -39,7 +38,6 @@ namespace ConstructionExchangeQuotes.Server.Controllers
             return Ok(quotes);
         }
 
-        [CrudPermission]
         [HttpDelete("delete/{id:int}")]
         public IActionResult DeleteQuote(int id)
         {
@@ -53,7 +51,6 @@ namespace ConstructionExchangeQuotes.Server.Controllers
             return Ok();
         }
 
-        [CrudPermission]
         [HttpPut("archive/{id:int}")]
         public IActionResult ArchiveQuote(int id)
         {
@@ -67,7 +64,6 @@ namespace ConstructionExchangeQuotes.Server.Controllers
             return Ok();
         }
 
-        [CrudPermission]
         [HttpPut("unarchive/{id:int}")]
         public IActionResult UnarchiveQuote(int id)
         {
