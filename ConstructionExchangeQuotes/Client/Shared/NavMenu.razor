@@ -10,23 +10,28 @@
             <NavLink class="nav-link" href="quotes" Match="NavLinkMatch.All">
                 <span class="oi oi-list" aria-hidden="true"></span> Quotes
             </NavLink>
-            @if (PermissionCacheService.CanDoCrudActions)
-            {
-                <ul class="nav flex-column expandable">
-                    <li class="nav-item px-3">
-                        <NavLink class="nav-link" href="quotes/create">
-                            <span class="oi oi-plus" aria-hidden="true"></span> Create
-                        </NavLink>
-                    </li>
-                    <li class="nav-item px-3">
-                        <NavLink class="nav-link" href="quotes/archived">
-                            <span class="oi oi-inbox" aria-hidden="true"></span> Archive
-                        </NavLink>
-                    </li>
-                </ul>
-            }
+            <ul class="nav flex-column expandable">
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="quotes/create">
+                        <span class="oi oi-plus" aria-hidden="true"></span> Create
+                    </NavLink>
+                </li>
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="quotes/archived">
+                        <span class="oi oi-inbox" aria-hidden="true"></span> Archive
+                    </NavLink>
+                </li>
+            </ul>
         </li>
-        @if (PermissionCacheService.CanDoCrudActions)
+        @if (!PermissionCacheService.CanDoCrudActions)
+        {
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="elements">
+                    <span class="oi oi-list" aria-hidden="true"></span> Element
+                </NavLink>
+            </li>
+        }
+        else
         {
             <li class="nav-item px-3">
                 <NavLink class="nav-link" href="elements">

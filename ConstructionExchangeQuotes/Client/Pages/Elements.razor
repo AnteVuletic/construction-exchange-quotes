@@ -9,7 +9,7 @@
 
 <div class="d-flex justify-content-between w-100 mb-5">
     <div class="row d-flex justify-content-between w-50">
-        <input placeholder="Name" class="form-control col-3" value="@_nameSearch" @oninput="NameChangedAsync"/>
+        <input placeholder="Name" class="form-control col-3" value="@_nameSearch" @oninput="NameChangedAsync" />
         <select placeholder="Element type" class="form-control col-4" value="@_elementTypeId" @onchange="ElementTypeChangedAsync">
             <option value="0">Element type</option>
             @foreach (var elementType in _elementTypes)

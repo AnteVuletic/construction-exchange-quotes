@@ -1,6 +1,7 @@
 ﻿@using ConstructionExchangeQuotes.Shared
 @using System.Net
 @inject HttpClient Http
+@inject ConstructionExchangeQuotes.Client.Services.PermissionCacheService PermissionCacheService
 
 @if (_elementInEdit != null)
 {
@@ -11,16 +12,19 @@
 
 @if (isPromptModalVisible)
 {
-    <PromptModal Title="Unable to delete element" Description="Please delete all quotes this element is used on before deleting element" OnClose="CloseModal" OnConfirm="CloseModal"/>
+    <PromptModal Title="Unable to delete element" Description="Please delete all quotes this element is used on before deleting element" OnClose="CloseModal" OnConfirm="CloseModal" />
 }
 
 <div class="card">
     <h5 class="card-header d-flex justify-content-between w-100">
         <span>@Element.Name</span>
-        <span>
-            <button type="button" class="btn btn-outline-primary" @onclick="() => _elementInEdit = Element.CloneObject()"><span class="oi oi-pencil"></span></button>
-            <button type="button" class="btn btn-outline-danger" @onclick="DeleteElement"><span class="oi oi-trash"></span></button>
-        </span>
+        @if (PermissionCacheService.CanDoCrudActions)
+        {
+            <span>
+                <button type="button" class="btn btn-outline-primary" @onclick="() => _elementInEdit = Element.CloneObject()"><span class="oi oi-pencil"></span></button>
+                <button type="button" class="btn btn-outline-danger" @onclick="DeleteElement"><span class="oi oi-trash"></span></button>
+            </span>
+        }
     </h5>
     <div class="card-body">
         <div class="card-text">
